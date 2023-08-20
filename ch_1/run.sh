@@ -1,1 +1,1 @@
-gcc -Wall "$1".c -o "$1" && ./"$1"
+gcc -fsanitize=undefined -Wall "$1".c -o "$1".out && ./"$1".out
