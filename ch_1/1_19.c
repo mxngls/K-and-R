@@ -2,14 +2,12 @@
 #define MAX_LEN 72
 
 int reverse(char line[], char reversed_line[]) {
-  int i;
-  int j;
-  int l;
+  int i, j, l;
 
   j = 0;
   i = 0;
 
-  while (line[i] != '\0' && i <= MAX_LEN) {
+  while (line[i] != '\0' && i < MAX_LEN) {
     ++i;
   }
 
@@ -25,18 +23,20 @@ int reverse(char line[], char reversed_line[]) {
 }
 
 int main() {
-  int c;
-  int i = 0;
-  char line[MAX_LEN];
-  char reversed_line[MAX_LEN];
+  int c, i;
+  char line[MAX_LEN], reversed_line[MAX_LEN];
+
+  i = 0;
 
   while ((c = getchar()) != EOF) {
-    if (c == '\n') {
-      line[i] = '\0';
+    if (c == '\n' || i == MAX_LEN - 1) {
+      if (i > 0) {
+        line[i] = '\0';
 
-      reverse(line, reversed_line);
+        reverse(line, reversed_line);
 
-      printf("%s\n", reversed_line);
+        printf("%s\n", reversed_line);
+      }
 
       i = 0;
     } else {
