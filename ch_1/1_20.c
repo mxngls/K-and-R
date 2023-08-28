@@ -1,17 +1,15 @@
 #include <stdio.h>
-#define BUFFER 1000
-#define TABSTOP 2
+#define TABSTOP 8
 
 int main() {
-	int c, i;
+  int c, i;
 
   while ((c = getchar()) != EOF) {
     if (c == '\t') {
-      i = 0;
-      while (++i <= TABSTOP) {
+      i = TABSTOP;
+      while (i-- > 0) {
         putchar(' ');
       }
-      i = 0;
     } else {
       putchar(c);
     }
