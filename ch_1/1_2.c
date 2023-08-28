@@ -1,8 +1,11 @@
 #include <stdio.h>
 
+/*   A full list of all available escape sequences can be found at */
+/*   https://en.cppreference.com/w/c/language/escape */
+
 int main() {
   
-  printf("\a, \r, \m, \z, \s");
+  printf("\a, \r, \e, \v, \s");
 
   return 0;
 }
