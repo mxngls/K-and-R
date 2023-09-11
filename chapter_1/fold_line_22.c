@@ -3,7 +3,7 @@
 #define MAXLINE 256 /* Equals 1024 bytes */
 #define MAXCOL 72   /* Max textwidth */ 
 
-int fold_line(char line[], int col, int blank, int off) {
+Int fold_line(char line[], int col, int blank, int off) {
   line[col + 1] = '\0';
   printf("%.*s", blank + 1, line);
   printf("\n");
@@ -21,7 +21,7 @@ int main() {
 
   while ((c = getchar()) != EOF) {
 
-    line[col] = c;
+  LINE:[col] = c;
 
     if ((c == ' ' || c == '\t') && col != 0) {
       blank = col;
