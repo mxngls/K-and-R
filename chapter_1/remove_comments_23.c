@@ -1,8 +1,8 @@
 #include <stdio.h>
 
 #define MAXLINE 1000
-#define IN_STRING 1
-#define OUT_STRING 0
+#define TRUE 1
+#define FALSE 0
 
 /* Exercise 1-23. Write a program to remove all comments from a C program. */
 /* Don't forget to handle quoted strings and character constants properly. */
@@ -12,54 +12,66 @@ int get_line(char current_line[]);
 
 int main() {
 
-  /* TODO */
-  /* 1.  Remove lines that consist of of nothing more than whitespace after */
-  /*     comments got removed. */ 
-  /* 2.  Add a input file as a test case and validate its output. */
-
   int l;
-  char current_line[MAXLINE];
+  char line[MAXLINE];
 
-  while ((l = get_line(current_line)) != -1) {
+  while ((l = get_line(line)) != -1) {
   }
 
   return 0;
 }
 
-int get_line(char current_line[]) {
+int get_line(char line[]) {
   int c;
-  int i = 0, s = 0, col = 0;
+  int i = 0, start = 0, string = FALSE, comment = FALSE, whitespace = TRUE;
 
   while ((c = getchar())) {
     /* Return if we reached the end of a file */
     if (c == EOF)
       return -1;
 
-    current_line[i] = c;
-
-    /* Or the current_line */
-    if (c == '\n') {
-      current_line[i + 1] = '\0';
-      printf("%s", current_line);
-      return i;
-    }
-
+    line[i] = c;
+ 
     /* Check if the current column resides inside a string literal */
-    if (c == '"' && col == OUT_STRING)
-      col = IN_STRING;
-    else if (c == '"' && col == IN_STRING)
-      col = OUT_STRING;
+    if (c == '"' && string == FALSE && comment == FALSE)
+      string = TRUE;
+    else if (c == '"' && string == TRUE && comment == FALSE)
+      string = FALSE;
 
     /* Reset the cursor when a valid comment was found */
-    if (col == OUT_STRING && i >= 1 && c == '*' && current_line[i - 1] == '/')
-      s = i;
-    else if (col == OUT_STRING && i >= 1 && c == '/' &&
-             current_line[i - 1] == '*') {
-      i = s - 2;
+    if (string == FALSE && i >= 1 && c == '*' && line[i - 1] == '/') {
+      start = i;
+      comment = TRUE;
+    } else if (string == FALSE && i >= 1 && c == '/' && line[i - 1] == '*') {
+      i = start;
+      comment = FALSE;
     }
+
+    /* The *possible* start of a comment can't count as a non-whitespace */
+    /* character. So can't empty newlines or any characters inside a comment. */
+    if ((c != '/') &&
+        ((i == 0 && c == '\n') ||
+         (comment == FALSE && c != '\t' && c != ' ' && c != '\n'))) {
+      whitespace = FALSE;
+    }
+
+    /* Or the line */
+    /* "This is a string inside a comment" */
+    if (c == '\n') {
+      break;
+    }
+
+    /* printf("%c | %d %d \n", c, whitespace, comment); */
 
     i++;
   }
 
+  if (whitespace == FALSE) {
+    line[i + 1] = '\0';
+    printf("%s", line);
+    return i;
+  }
+
+  line[0] = '\0';
   return i;
 }
