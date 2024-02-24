@@ -8,32 +8,22 @@ void squeeze(char s1[], char s2[]) {
    */
   int i, j, n;
   i = 0;
-  j = 0;
-  n = 0;
 
-  while (s1[i] != '\0') {
-    /* TODO: Reduce nested loops. */
-    /* Check if the current character of s1 matches one of the
-     * characters present in s2
-     */
+  while (s2[i] != '\0') {
 
     j = 0;
+    n = 0;
 
-    /* Increment over s2 */
-    while (s2[j] != '\0') {
-      if (s1[i] == s2[j]) {
-        n = i;
-        /* Shift characters of s1 by one character to get rid of the
-         * matched character
-         */
-        while (s1[n] != '\0') {
-          s1[n] = s1[n + 1];
-          n++;
-        }
-        s1[n - 1] = '\0';
-      }
-      j++;
+    /* Shift characters of s1 by one character to get rid of the
+     * matched character if there is one.
+     */
+    while (s1[j++] != '\0') {
+      if (s1[j] != s2[i])
+        s1[n++] = s1[j];
     }
+
+    s1[n] = '\0';
+
     i++;
   }
 }
@@ -45,7 +35,7 @@ void squeeze(char s1[], char s2[]) {
  */
 int main() {
   char s1[] = "This is a test";
-  char s2[] = "ttttt";
+  char s2[] = "This";
 
   printf("String one: %s\nString two: %s\n", s1, s2);
 
