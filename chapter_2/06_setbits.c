@@ -23,6 +23,7 @@ int setbits(int x, int p, int n, int y) {
     return -1;
   }
 
+  /* Cannot move further than 15 digits max */
   if (p + n > 15) {
     printf("Cannot move digits further than the 15th digits. Setting p equal "
            "to %d.\n",
