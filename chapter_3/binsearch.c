@@ -7,17 +7,18 @@ int binsearch(int x, int v[], int n) {
   low = 0;
   high = n - 1;
 
-  while (low <= high) {
+  while (low < high) {
     /*
      * Reminders are simply discarded (instead of simply beeing rounded) 
      * if using input parameters of type int
      */
     mid = (low + high) / 2;
 
-    if (x < v[mid])
-      high = mid + 1;
+    if (x <= v[mid])
+      high = mid;
     else
       low = mid + 1;
+
   }
   return v[low] == x ? low : -1;
 }
