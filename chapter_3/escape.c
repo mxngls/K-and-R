@@ -42,6 +42,34 @@ void escape(char from[], char to[]) {
   to[j] = from[i];
 }
 
+/* Re-escape said characters */
+void rescape(char from[], char to[]) {
+  int i;
+  int j;
+
+  i = 0;
+  j = 0;
+
+  while(from[i] != '\0') {
+    if (from[i] == '\\') {
+      switch (from[i++]) {
+        case 'n':
+        case 't':
+        case 'r':
+          to[j] = from[i];
+      }
+    } else to[j] = from[i];
+
+    i++;
+    j++;
+  }
+
+  /* Account for the missing null character itself */
+  to[j] = '\0';
+
+}
+
+
 /*
  * Exercise 3-2. Write a function escape(s,t) that converts characters
  * like newline and tab into visible escape sequences like \n and \t as
@@ -53,8 +81,10 @@ int main() {
   char to[MAX_LEN];
 
   escape(from, to);
+  rescape(to, from);
 
-  printf("%s\n", to);
+  printf("Escaped: %s\n", to);
+  printf("Re-escaped: %s\n", from);
 
   return 0;
 }
