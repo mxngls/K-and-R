@@ -2,15 +2,8 @@
 
 #define MAX_LEN 4095
 
-/*
- * Exercise 3-2. Write a function escape(s,t) that converts characters
- * like newline and tab into visible escape sequences like \n and \t as
- * it copies the string t to s. Use a switch. Write a function for the
- * other direction as well, converting escape sequences into the real
- * characters. */
-int main() {
-  char from[MAX_LEN] = "This is a \r test string with a newline \n!";
-  char to[MAX_LEN];
+/* Escape certain whitespace characters in a given string */
+void escape(char from[], char to[]) {
   char e;
   int i;
   int j;
@@ -47,6 +40,19 @@ int main() {
 
   /* Account for the null character itself */
   to[j] = from[i];
+}
+
+/*
+ * Exercise 3-2. Write a function escape(s,t) that converts characters
+ * like newline and tab into visible escape sequences like \n and \t as
+ * it copies the string t to s. Use a switch. Write a function for the
+ * other direction as well, converting escape sequences into the real
+ * characters. */
+int main() {
+  char from[MAX_LEN] = "This is a \r test string with a newline \n!";
+  char to[MAX_LEN];
+
+  escape(from, to);
 
   printf("%s\n", to);
 
