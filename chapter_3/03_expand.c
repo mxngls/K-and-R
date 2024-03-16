@@ -1,8 +1,6 @@
 #include <stdio.h>
 
 #define MAX_LEN 4095
-#define IS_CHAR 1
-#define IS_DIGIT 2
 #define IS_RANGE 1
 
 int is_char(int x) {
@@ -19,58 +17,60 @@ int is_digit(int x) {
     return 0;
 }
 
-void expand(char s1[], char s2[]) {
-  int i, j, m, r, n, s, e;
-
-  /* r = m = j = s = e = 0; */
+int expand(char s1[], char s2[]) {
+  int i, j, r, n, s, e;
 
   r = 0;
-  m = 0;
   j = 0;
   s = 0;
   e = 0;
 
   /* Iterate over string one */
   for (i = 0; s1[i] != '\0'; i++) {
-    /* printf("Current char: %c\n", s1[i]); */
-    /* printf("Current char as digit: %d\n", s1[i]); */
-
     /*
-     * TODO: Make sure we only parse a range as such if it is valid
-     * (i.e. a digit follows a previous digit and not a character).
+     * Determine if we currently parse a range sequence. Consequent '-'
+     * characters are interpreted as one single one.
+     *
+     * In addition leading or trailing '-' characters should be 
+     * interpreded literally.
      */
-
-    /* Check if the current character is a valid character */
-    if (is_char(s1[i])) {
-      m = IS_CHAR;
-    } else if (is_digit(s1[i])) {
-      m = IS_DIGIT;
-    } else if ((s1[i] == '-' && r != IS_RANGE)) {
-      r = IS_RANGE;
+    if (s1[i] == '-') {
+      if (i > 0 && s1[i + 1] != '\0' && r != IS_RANGE) {
+        r = IS_RANGE;
+      } else
+        i++;
     }
 
     if (r != IS_RANGE) {
-
       s = s1[i];
-
     } else if ((e = s1[i]) > s) {
+      /*
+       * Make sure we only parse valid ranges (i.e. characters following
+       * characters or digits following digits
+       */
+      if (is_char(s) != is_char(e)) {
+        printf("Aborting. Found invalid range sequence: %s\n", s1);
+        return -1;
+      }
 
-      for (n = 0; s + n < e; n++, j++) {
-        /* printf("Current range char: %c\n", s + n); */
+      for (n = 0; s + n <= e; n++, j++) {
         s2[j] = s + n;
       }
 
-      s2[j] = s + n; /* Get the last char as well */
-      s = e;         /* Set the new start point */
-      r = 0;         /* Toggle range indicator */
-    }
+      /* Set the new start point */
+      if (s1[i + 1] == '-')
+        s = (e + 1);
+      else
+        s = e;
 
-    /*
-     * If the current character is not a character check if it indicates
-     * a range sequence
-     */
+      /* Toggle range indicator */
+      r = 0;
+    }
   }
-  s2[++j] = '\0';
+
+  s2[j] = '\0';
+
+  return 0;
 }
 
 /*
@@ -81,13 +81,66 @@ void expand(char s1[], char s2[]) {
  * a leading or trailing - is taken literally.
  */
 int main() {
-  char s1[MAX_LEN] = "a-e-k-m-x-z";
-  char s2[MAX_LEN];
+  char s1[MAX_LEN] = "a-z";
+  char s2[MAX_LEN] = "a---z";
+  char s3[MAX_LEN] = "-a-z-";
+  char s4[MAX_LEN] = "b-e-y";
+  char s5[MAX_LEN] = "a-l0-9m-z";
+  char s6[MAX_LEN] = "0-e-y";
+  char out[MAX_LEN];
 
-  expand(s1, s2);
+  /* Most simple possible case */
+  if (expand(s1, out) != 0)
+    return -1;
 
   printf("String 1: %s\n", s1);
-  printf("String 2: %s\n", s2);
+  printf("String 2: %s\n", out);
+  printf("\n");
+
+  /* Multiple range characters are interpreded as one */
+  if (expand(s2, out) != 0)
+    return -1;
+
+  printf("String 1: %s\n", s2);
+  printf("String 2: %s\n", out);
+  printf("\n");
+
+  /* Leading and trailing range characters are to be ignored */
+  if (expand(s3, out) != 0)
+    return -1;
+
+  printf("String 1: %s\n", s3);
+  printf("String 2: %s\n", out);
+  printf("\n");
+
+  /* Multiple character range sequences chained together */
+  if (expand(s4, out) != 0)
+    return -1;
+
+  printf("String 1: %s\n", s4);
+  printf("String 2: %s\n", out);
+  printf("\n");
+
+  /*
+   * Supplying multiple range sequences consisting of characters and
+   * digits
+   */
+  if (expand(s5, out) != 0)
+    return -1;
+
+  printf("String 1: %s\n", s5);
+  printf("String 2: %s\n", out);
+  printf("\n");
+
+  /*
+   * Return an error if the input string consists of an invalid range
+   * sequence
+   */
+  if (expand(s6, out) != 0)
+    return -1;
+
+  printf("String 1: %s\n", s6);
+  printf("String 2: %s\n", out);
 
   return 0;
 }
