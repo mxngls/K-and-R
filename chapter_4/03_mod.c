@@ -1,3 +1,4 @@
+#include <math.h>
 #include <stdio.h>
 #include <stdlib.h> /* for  atof() */
 
@@ -35,6 +36,13 @@ int main() {
         push(pop() / op2);
       else
         printf("error: zero divisor\n");
+      break;
+    case '%':
+      op2 = pop();
+      if (op2 != 0.0)
+        push(fmod(pop(), op2));
+      else
+        printf("error: zero modulo\n");
       break;
     case '\n':
       printf("\t%.8g\n", pop());
@@ -83,19 +91,34 @@ int getop(char s[]) {
 
   while ((s[0] = c = getch()) == ' ' || c == '\t')
     ;
+
   s[1] = '\0';
-  if (!isdigit(c) && c != '.')
-    return c; /* not a number */
+
   i = 0;
-  if (isdigit(c)) /* collect integer part */
+
+  if (c == '-') {
+    if (isdigit(c = getch())) { /* the '-' is an algebraic sign */
+      s[++i] = c;
+    } else { /* the '-' is an operator */
+      ungetch(c);
+      return '-';
+    }
+  } else if (!isdigit(c) && c != '.')
+    return c; /* not a number */
+
+  if (isdigit(c))
     while (isdigit(s[++i] = c = getch()))
       ;
+
   if (c == '.') /* collect fraction part */
     while (isdigit(s[++i] = c = getch()))
       ;
+
   s[i] = '\0';
+
   if (c != EOF)
     ungetch(c);
+
   return NUMBER;
 }
 
