@@ -18,7 +18,7 @@ char s[MAXOP];
 
 /* reverse Polish calculator */
 int main() {
-  int type, tmp;
+  int type;
   double op2;
 
   while ((type = getop(s)) != EOF) {
@@ -148,6 +148,9 @@ int getop(char s[]) {
 
   i = 0;
 
+  if (!isdigit(c) && c != '.' && c != '-')
+    return c; /* not a number */
+
   if (c == '-') {
     if (isdigit(c = getch())) { /* the '-' is an algebraic sign */
       s[++i] = c;
@@ -155,8 +158,7 @@ int getop(char s[]) {
       ungetch(c);
       return '-';
     }
-  } else if (!isdigit(c) && c != '.')
-    return c; /* not a number */
+  }
 
   if (isdigit(c))
     while (isdigit(s[++i] = c = getch()))
