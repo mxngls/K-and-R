@@ -9,7 +9,11 @@ int getop(char[]);
 void push(double);
 double pop(void);
 
-/* reverse Polish calculator */
+/* 
+ * Exercise 4-3. Given the basic framework, it's straightforward to 
+ * extend the calculator. Add the modulus (%) operator and provisions 
+ * for negative numbers. 
+ */
 int main() {
   int type;
   double op2;
