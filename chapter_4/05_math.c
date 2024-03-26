@@ -84,7 +84,7 @@ int sp = 0;         /* next free stack position */
 
 void prints(void) {
   if (sp == 0)
-    return;
+    printf("error: stack empty\n");
   else if (sp > 1) {
     printf("Current top of stack: %g %g\n", val[sp - 1], val[sp - 2]);
   } else
@@ -92,12 +92,9 @@ void prints(void) {
 }
 
 void clears(void) {
-  if (sp > 0) {
-    while (--sp > 0)
-      ;
-    printf("cleared stack\n");
-    getchar();
-  }
+  while (sp > 0)
+    sp--;
+  printf("cleared stack\n");
 }
 
 void swaps(void) {
@@ -106,7 +103,6 @@ void swaps(void) {
     tmp = val[sp - 1];
     val[sp - 1] = val[sp - 2];
     val[sp - 2] = tmp;
-    getchar();
   }
 }
 
@@ -114,9 +110,8 @@ void dups(void) {
   if (sp > 1) {
     push(val[sp - 2]);
     push(val[sp - 2]);
-    getchar();
   } else
-    printf("not enough elements in stack");
+    printf("error: stack empty\n");
 }
 
 double parse(char s[], double n) {
