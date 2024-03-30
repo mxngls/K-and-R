@@ -45,12 +45,14 @@ int main() {
         } else
           push(vars[s[0] - 'a']);
       } else {
-        if (cmd(s))
+        if (cmd(s)) {
           /*
            * Add zero to the stack as the execution of a command
            * triggers the removal of the top element of the stack
            */
+          push(0);
           break;
+        }
         push(math(s, pop()));
       }
       break;
@@ -92,9 +94,9 @@ int main() {
       /* Resets our variable */
       var = 0;
 
-      /* 
+      /*
        * Remove operator one from the stack and replace it with the
-       * result from our variable assignment 
+       * result from our variable assignment
        */
       pop();
       push(op2);
