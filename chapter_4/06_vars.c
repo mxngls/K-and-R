@@ -4,21 +4,19 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define MAXOP 100        /* max size of operand or operator */
-#define NUMBER '0'       /* signal that a number was found */
-#define ALPHA 'A'        /* signal that a number was found */
-#define MAXVAL 100       /* maximum depth of val stack */
+#define MAXOP 100  /* max size of operand or operator */
+#define NUMBER '0' /* signal that a number was found */
+#define ALPHA 'A'  /* signal that a number was found */
+
+/* ####### DEBUG ####### */
+void printvars(void);
+void printval(void);
 
 int getop(char[]);
-void prints(void);
-void clears(void);
-void swaps(void);
-void dups(void);
-double parse(char[], double);
+double math(char[], double n);
+int cmd(char[]);
 void push(double);
 double pop(void);
-void fill(double vp[]);
-void printval(void);
 
 char s[MAXOP];
 double vars[26] = {0};
@@ -40,11 +38,16 @@ int main() {
       break;
     case ALPHA:
       if (strlen(s) == 1) {
-        if (var == 0)
+        if (var == 0) {
           var = s[0];
-        push(vars[var - 'a']);
-      } else
-        push(parse(s, pop()));
+          push(vars[var - 'a']);
+        } else
+          push(vars[s[0] - 'a']);
+      } else {
+        if (cmd(s))
+          break;
+        push(math(s, pop()));
+      }
       break;
     case '+':
       push(pop() + pop());
@@ -74,21 +77,23 @@ int main() {
       printf("\t%.8g\n", pop());
       break;
     case '=':
+
+      /* Get value that is to be assigned */
       op2 = pop();
 
-      /* 
-       * After variable assignment the top of the stack should equal 
-       * zero 
-       *
-       * TODO: Currently the stack doesn't get cleared correctly after
-       * assigning variables. The condition below does not work.
-       */
-      if (vars[var - 'a'] != 0.00) {
-        pop();
-        push(0.00);
-      }
-
+      /* Assign to variable */
       vars[(int)var - 'a'] = op2;
+
+      /* Resets our variable */
+      var = 0;
+
+      /* 
+       * Remove operator one from the stack and replace it with the
+       * result from our variable assignment 
+       */
+      pop();
+      push(op2);
+
       break;
     default:
       printf("error: unknown command %s\n", s);
@@ -98,8 +103,11 @@ int main() {
   return 0;
 }
 
+#define MAXVAL 100  /* maximum depth of val stack */
 double val[MAXVAL]; /* value stack */
 int sp = 0;         /* next free stack position */
+
+/* ############################# DEBUG ############################# */
 
 /* Inspect the value stack */
 void printval(void) {
@@ -110,11 +118,30 @@ void printval(void) {
   printf("\n");
 }
 
+/* Inspect the value stack */
+void printvars(void) {
+  int i;
+
+  printf("\n");
+
+  for (i = 0; i < 26; ++i) {
+    if (vars[i] > 0)
+      printf("%.2f ", vars[i]);
+    else
+      printf("_ ");
+  }
+  printf("\n\n");
+}
+
+/* ################################################################# */
+
 void prints(void) {
   if (sp == 0)
     printf("error: stack empty\n");
-  else
+  else if (sp == 2)
     printf("Only one element in stack: %g\n", val[sp - 1]);
+  else
+    printf("Top of stack: %g, %g\n", val[sp - 1], val[sp - 2]);
 }
 
 void clears(void) {
@@ -129,7 +156,8 @@ void swaps(void) {
     tmp = val[sp - 1];
     val[sp - 1] = val[sp - 2];
     val[sp - 2] = tmp;
-  }
+  } else
+    printf("error: stack empty\n");
 }
 
 void dups(void) {
@@ -140,17 +168,39 @@ void dups(void) {
     printf("error: stack empty\n");
 }
 
-double parse(char s[], double n) {
+double math(char s[], double n) {
   if (strncmp(s, "sin", 3) == 0) {
     return sin(n);
   } else if (strncmp(s, "cos", 3) == 0) {
     return cos(n);
   } else if (strncmp(s, "tan", 3) == 0) {
     return tan(n);
-  } else {
-    printf("error: unrecognized operator\n");
-    return 0.0;
+  } else
+    printf("error: unknown command %s\n", s);
+
+  return n;
+}
+
+void prints(void);
+void clears(void);
+void swaps(void);
+void dups(void);
+
+int cmd(char s[]) {
+  if (strncmp(s, "prints", 6) == 0) {
+    prints();
+    return 1;
+  } else if (strncmp(s, "clears", 6) == 0) {
+    clears();
+    return 1;
+  } else if (strncmp(s, "swaps", 5) == 0) {
+    swaps();
+    return 1;
+  } else if (strncmp(s, "dups", 4) == 0) {
+    dups();
+    return 1;
   }
+  return 0;
 }
 
 /* push:  push f onto value stack */
