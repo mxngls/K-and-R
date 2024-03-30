@@ -145,10 +145,10 @@ void printvars(void) {
 void prints(void) {
   if (sp == 0)
     printf("error: stack empty\n");
-  else if (sp == 2)
-    printf("Only one element in stack: %g\n", val[sp - 1]);
+  else if (sp < 2)
+    printf(">>> %g\n", val[sp - 1]);
   else
-    printf("Top of stack: %g, %g\n", val[sp - 1], val[sp - 2]);
+    printf(">>> %g, %g\n", val[sp - 1], val[sp - 2]);
 }
 
 void clears(void) {
@@ -163,7 +163,9 @@ void swaps(void) {
     tmp = val[sp - 1];
     val[sp - 1] = val[sp - 2];
     val[sp - 2] = tmp;
-  } else
+  } else if (sp == 1)
+    printf("error: not enough elements in stack\n");
+  else
     printf("error: stack empty\n");
 }
 
@@ -172,7 +174,7 @@ void dups(void) {
     push(val[sp - 2]);
     push(val[sp - 2]);
   } else
-    printf("error: stack empty\n");
+    printf("error: not enough elements in stack\n");
 }
 
 double math(char s[], double n) {
