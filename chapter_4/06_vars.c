@@ -39,12 +39,17 @@ int main() {
     case ALPHA:
       if (strlen(s) == 1) {
         if (var == 0) {
+          /* Only set if variable already was assigned before */
           var = s[0];
           push(vars[var - 'a']);
         } else
           push(vars[s[0] - 'a']);
       } else {
         if (cmd(s))
+          /*
+           * Add zero to the stack as the execution of a command
+           * triggers the removal of the top element of the stack
+           */
           break;
         push(math(s, pop()));
       }
