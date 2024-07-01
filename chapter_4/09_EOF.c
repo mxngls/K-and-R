@@ -29,15 +29,20 @@ void ungetch(int c) /* push character back on input */
         buf[bufp++] = c;
 }
 
+/*
+ * Exercise 4-9. Our getch and ungetch do not handle a pushed-back EOF
+ * correctly. Decide what their properties ought to be if an EOF is
+ * pushed back, then implement your design.
+ */
 int main(void)
 {
     int c;
 
+    /* Prematurely send EOF. */
     ungetch(EOF);
 
     while ((c = getch()) != EOF)
         putchar(c);
-    printf("\n");
 
     return 0;
 }
