@@ -11,6 +11,12 @@
  * systems char is defined as a signed integer. This was not the case
  * when K&R was written this it is safer to define buf as an integer
  * array instead of an array whose elements are of type char.
+ *
+ * For a full description of the problem see page 88 of "The C Answer
+ * Book" by Clovis L. Tondo, Scott E. Gimpel.
+ *
+ * See also page 43f. of K&R.
+ * 
  */
 
 int buf[BUFSIZE]; /* buffer for ungetch */
