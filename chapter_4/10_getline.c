@@ -9,7 +9,6 @@
 /* function prototypes */
 int getop(char p[]);
 int getline_(char l[], int limit);
-void calc(char l[]);
 void push(double);
 double pop(void);
 
@@ -82,8 +81,6 @@ int main(void) {
 
   return 0;
 }
-
-void calc(char line[]) {}
 
 #define MAXVAL 100 /* maximum depth of val stack */
 
