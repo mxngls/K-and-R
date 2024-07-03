@@ -100,7 +100,7 @@ double pop(void) {
   if (sp > 0)
     return val[--sp];
   else {
-    printf("errror: stack empty\n");
+    printf("error: stack empty\n");
     return 0.0;
   }
 }
