@@ -48,6 +48,22 @@ char *_strncat(char *s, const char *ct, size_t n) {
   return s;
 }
 
+/*
+ * compare at most n characters of string cs to string ct;
+ * return <0 if cs<ct, 0 if cs==ct, or >0 if cs>ct.
+ */
+int _strncmp(const char *cs, const char *ct, size_t n) {
+  int i;
+
+  i = 0;
+  while (i++ < n && (*cs++ == *ct++)) {
+    if (!*cs)
+      return 0;
+  }
+  
+  return *cs - *ct;
+}
+
 int main() {
   char source[SIZE] = "Hello, World!";
   char target_1[SIZE];
@@ -72,6 +88,11 @@ int main() {
 
   /* prints "Hello, World" (missing '!') */
   printf("%s\n", head);
+
+  int r;
+  r = _strncmp(head, tail, 10);
+
+  printf("%d\n", r);
 
   return 0;
 }
