@@ -29,6 +29,25 @@ char *_strncpy(char *s, const char *ct, size_t n) {
   return s;
 }
 
+/*
+ * concatentate at most n characters of string ct to string s, terminate
+ * s with '\0'; return s.
+ */
+char *_strncat(char *s, const char *ct, size_t n) {
+  int i;
+
+  while (*s)
+    s++;
+
+  i = 0;
+  while (++i < n && (*s++ = *ct++))
+    ;
+
+  *s = '\0';
+
+  return s;
+}
+
 int main() {
   char source[SIZE] = "Hello, World!";
   char target_1[SIZE];
@@ -45,6 +64,14 @@ int main() {
   int i = -1;
   while (source[++i])
     printf("%c\n", target_1[i]);
+
+  char head[SIZE] = "Hello, ";
+  char tail[SIZE] = "World!";
+
+  _strncat(head, tail, 6);
+
+  /* prints "Hello, World" (missing '!') */
+  printf("%s\n", head);
 
   return 0;
 }
