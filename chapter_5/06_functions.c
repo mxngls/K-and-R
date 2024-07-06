@@ -6,19 +6,22 @@
 int _getline(char *s, int lim) {
   int i;
 
-  i = lim;
-  while (--lim && (*s = getchar()) != EOF && *s != '\n')
+  i = 0;
+  while (--lim && (*s = getchar()) != EOF && *s != '\n') {
     s++;
+    i++;
+  }
 
   *++s = '\0';
 
-  return i - lim;
+  return i;
+}
 }
 
 int main() {
   char s[SIZE];
 
-  while (_getline(s, SIZE) != EOF)
+  while (_getline(s, SIZE) > 0)
     printf("Input: %s", s);
 
   return 0;
