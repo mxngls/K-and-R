@@ -5,21 +5,14 @@
 /* getline: get line int s, return length */
 int _getline(char *s, int lim) {
   int i;
-  int c;
 
-  i = 0;
-  c = 0;
-  while (--lim && (c = getchar()) != EOF && c != '\n') {
-    i++;
-    *s++ = c;
-  }
+  i = lim;
+  while (--lim && (*s = getchar()) != EOF && *s != '\n')
+    s++;
 
-  if (c == '\n')
-    *s++ = '\n';
+  *++s = '\0';
 
-  *s = '\0';
-
-  return i;
+  return i - lim;
 }
 
 int main() {
