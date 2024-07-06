@@ -1,3 +1,4 @@
+#include <ctype.h>
 #include <stdio.h>
 
 #define SIZE 100
@@ -37,11 +38,31 @@ int _strindex(char *s, char *t) {
   return j;
 }
 
+/* atoi:  convert s to integer; version 2 */
+int atoi(char *s) {
+  int i, n, sign;
+
+  while (isspace(*s)) /* skip white space */
+    s++;
+
+  sign = (*s == '-') ? -1 : 1;
+  if (*s == '+' || *s == '-') /* skip sign */
+    s++;
+
+  n = 0;
+  while (isdigit(*s)) {
+    n = 10 * n + (*s - '0');
+    s++;
+  }
+
+  return sign * n;
+}
+
 int main() {
   char s[SIZE];
 
-  while (_getline(s, SIZE) > 0)
-    printf("Input: %s", s);
+  _getline(s, SIZE);
+  printf("getline: %s", s);
 
   int i;
 
@@ -50,13 +71,21 @@ int main() {
   i = _strindex(a, b);
 
   /* prints "8" */
-  printf("%d \n", i);
+  printf("strindex: %d \n", i);
 
   char c[SIZE] = "Hello, World!";
   char d[SIZE] = "Wod";
   i = _strindex(c, d);
 
   /* prints "-1" */
-  printf("%d \n", i);
+  printf("strindex: %d \n", i);
+
+  char *str_num = "40";
+  int num;
+  num = atoi(str_num);
+
+  /* prints 42 */
+  printf("atoi: %d\n", num);
+
   return 0;
 }
