@@ -89,9 +89,11 @@ int main() {
   /* prints "Hello, World" (missing '!') */
   printf("%s\n", head);
 
+  char part[SIZE] = "Hello,";
   int r;
-  r = _strncmp(head, tail, 10);
+  r = _strncmp(source, part, 10);
 
+  /* prints "87" */
   printf("%d\n", r);
 
   return 0;
