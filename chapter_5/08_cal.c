@@ -76,7 +76,7 @@ int main() {
   if (month_day(year, yearday, &pmonth, &pday) == -1)
     return -1;
 
-  printf("Today day %d of the year: %d/%d/%d\n", yearday, year, month, day);
+  printf("Today is day %d of the year: %d/%d/%d\n", yearday, year, month, day);
 
   return 0;
 }
