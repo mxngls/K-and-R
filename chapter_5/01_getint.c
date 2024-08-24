@@ -66,7 +66,7 @@ int getint(int *pn) {
  * getint might expect.
  */
 int main() {
-  int n, s, getint(int *);
+  int n, s, getinssdt(int *);
 
   int array[LEN] = {0};
 
