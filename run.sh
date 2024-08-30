@@ -5,5 +5,5 @@ gcc \
   -fsanitize=undefined \
   -Wall \
   "$1" \
-  -o "${1%.c}".out &&
-  ./"${1%.c}".out "$*"
+  -o "./out/${1%.c}".out &&
+  ./out/"${1%.c}".out "$*"
