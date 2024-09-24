@@ -1,74 +1,78 @@
 #include <ctype.h>
 #include <stdio.h>
-#include <stdlib.h>
 
-#define TABSTOP 8    /* default tabstop */
-#define MAXSTOP 800  /* maximium number of digits for a valid tabstop */
+#define TABSTOP 4   /* default tabstop */
+#define MAXSTOP 800 /* maximium number of digits for a valid tabstop */
 
-void parse_ts(char *arg, int ts[]) {
+int parse_tabs(int argc, char **argv, int ts[], int *tn) {
+    char c;
+    int i;
 
-  char d[MAXSTOP];
-
-  int i, n, c;
-
-  i = n = c = 0;
-  while (*arg && c++ < MAXSTOPS) {
-    if (*arg == ',') {
-      ts[n++] = atoi(d);
-      i = 0;
+    if (argc > 2) {
+        printf("To many arguments. Usage: entab -t=[tabstops]\n");
+        return 1;
     }
 
-    if (isdigit(*arg) && i < MAXSTOP) {
-      d[i++] = *arg;
-      d[i] = '\0';
+    if (**++argv != '-' || *(*argv + 1) != 't' || *(*argv + 2) != '=') {
+        printf("Invalid argument format. Usage: -t=[tabstops]\n");
+        return 1;
     }
-    ++arg;
-  }
 
-  if (i > 0) {
-    ts[n++] = atoi(d);
-  }
+    *argv += 3;
+
+    i = 0;
+    while ((c = *(*argv)++)) {
+        if (i >= MAXSTOP) {
+            printf("Max tabstop count exceeded. Exiting.\n");
+            return 1;
+        }
+
+        if (c == ',') {
+            *tn = i++;
+        } else if (isdigit(c)) {
+            ts[i] = (ts[i] * 10) + (c - '0');
+        }
+    }
+
+    return 0;
 }
 
 int main(int argc, char **argv) {
-  int ts[MAXSTOP];
 
-  if (argc != 2) {
-    printf("Usage: entab -t[tabstops]\n");
-    return 1;
-  }
+    int tn;                /* number tabstops */
+    int ts[MAXSTOP] = {0}; /* tabstops */
 
-  parse_ts((++argv)[0], ts);
+    int c; /* current char */
+    int s; /* number of spaces */
 
-  /* DEBUG *
-  int i = 0;
-  while (ts[i] != '\0') {
-    printf("Current value of ts: %d\n", ts[i]);
-    i++;
-  }
-  */
+    int i; /* index of current tabstop */
+    int t; /* current tabstop */
 
-  /* int c; /1* current char *1/ */
-  /* int s; /1* number of spaces *1/ */
-  /* s = 0; */
+    tn = 0;
+    if (parse_tabs(argc, argv, ts, &tn))
+        return 1;
 
-  /* while ((c = getchar()) != EOF) { */
-  /*   if (c == ' ') { */
-  /*     if (++s % TABSTOP == 0) { */
-  /*       putchar('\t'); */
-  /*       s = 0; */
-  /*     } */
-  /*   } else { */
-  /*     if (s % TABSTOP != 0) { */
-  /*       while (s-- > 0) */
-  /*         putchar(' '); */
-  /*     } */
+    i = 0;
+    s = 0;
+    t = ts[i] ? ts[i] : TABSTOP;
 
-  /*     putchar(c); */
+    while ((c = getchar()) != EOF) {
 
-  /*     s = 0; */
-  /*   } */
-  /* } */
+        if (c == ' ') {
+            if (++s % t == 0) {
+                putchar('\t');
+                s = 0;
+                t = i++ <= tn ? ts[i] : TABSTOP;
+            }
+        } else {
+            if (s % t != 0) {
+                while (s-- > 0)
+                    putchar(' ');
+            }
 
-  return 0;
+            putchar(c);
+
+            s = 0;
+        }
+    }
 }
