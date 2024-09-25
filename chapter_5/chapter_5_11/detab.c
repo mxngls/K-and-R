@@ -9,7 +9,7 @@ int parse_tabs(int argc, char **argv, int ts[], int *tn) {
     int i;
 
     if (argc > 2) {
-        printf("To many arguments. Usage: entab -t=[tabstops]\n");
+        printf("Invalid number of arguments. Usage: entab -t=[tabstops]\n");
         return 1;
     }
 
