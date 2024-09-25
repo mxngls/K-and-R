@@ -2,9 +2,7 @@
 
 gcc \
     -std=c90 \
-    -g3 \
     -fsanitize=undefined \
-    -fsanitize-trap \
     -Wall \
     -Wextra \
     -Wconversion \
