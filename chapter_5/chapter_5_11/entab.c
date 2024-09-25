@@ -13,7 +13,8 @@ int parse_tabs(int argc, char **argv, int ts[], int *tn) {
         return 1;
     }
 
-    if (**++argv != '-' || *(*argv + 1) != 't' || *(*argv + 2) != '=') {
+    if (argc == 2 &&
+        (**++argv != '-' || *(*argv + 1) != 't' || *(*argv + 2) != '=')) {
         printf("Invalid argument format. Usage: -t=[tabstops]\n");
         return 1;
     }
