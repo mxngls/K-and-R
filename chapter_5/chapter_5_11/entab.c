@@ -62,7 +62,7 @@ int main(int argc, char **argv) {
             if (++s % t == 0) {
                 putchar('\t');
                 s = 0;
-                t = i++ <= tn ? ts[i] : TABSTOP;
+                t = i++ < tn ? ts[i] : TABSTOP;
             }
         } else {
             if (s % t != 0) {

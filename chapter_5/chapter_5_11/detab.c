@@ -61,7 +61,7 @@ int main(int argc, char **argv) {
     while ((c = getchar()) != EOF) {
         if (c == '\t') {
             ns = t - (col % t);
-            t = i <= tn ? ts[i++] : TABSTOP;
+            t = i < tn ? ts[i++] : TABSTOP;
             while (ns-- > 0) {
                 putchar(' ');
                 col++;
