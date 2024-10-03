@@ -1,3 +1,6 @@
 TabWidth: 4
 IndentWidth: 4
 ColumnLimit: 80
+ReflowComments:  true
+PenaltyBreakComment: 0
+PenaltyBreakOpenParenthesis: 1
