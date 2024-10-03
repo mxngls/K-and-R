@@ -84,26 +84,55 @@ int numcmp(const char *s1, const char *s2) {
         return 0;
 }
 
+void skipc(const char *s) {
+    while (!(isalnum(*s) || isspace(*s)) && (*s++))
+        ;
+}
+
 char foldchar(char c) { return c <= 'Z' && c >= 'A' ? c + 'a' - 'A' : c; }
+
+/* foldcmp: compare s1 and s2 ignoring case differences */
+int foldcmp(const char *s1, const char *s2) {
+    char c1, c2;
+    while (*s1 && *s2) {
+
+        if (directory) {
+            skipc(s1);
+            skipc(s2);
+        }
+
+        c1 = foldchar(*s1);
+        c2 = foldchar(*s2);
+
+        if (c1 != c2) {
+            return c1 - c2;
+        }
+
+        s1++;
+        s2++;
+    }
+
+    return c1 - c2;
+}
 
 /* custom strcmp */
 int _strcmp(const char *s1, const char *s2) {
     char c1, c2;
-
-    while ((c1 = *s1++) && (c2 = *s2++)) {
+    while (*s1 && *s2) {
         if (directory) {
-            while (!(isalnum(c1) || isspace(c1)) && (c1 = *s1++))
-                ;
-            while (!(isalnum(c2) || isspace(c2)) && (c2 = *s2++))
-                ;
+            skipc(s1);
+            skipc(s2);
         }
-        if (fold) {
-            c1 = foldchar(c1);
-            c2 = foldchar(c2);
-        }
+
+        c1 = *s1;
+        c2 = *s2;
+
         if (c1 != c2) {
             return c1 - c2;
         }
+
+        s1++;
+        s2++;
     }
 
     return c1 - c2;
@@ -162,9 +191,10 @@ int main(int argc, char *argv[]) {
     }
 
     if ((nlines = readlines(lineptr, MAXLINES)) >= 0) {
-        _qsort(
-            (void **)lineptr, 0, nlines - 1, fold,
-            (int (*)(const void *, const void *))(numeric ? numcmp : _strcmp));
+        _qsort((void **)lineptr, 0, nlines - 1, fold,
+               (int (*)(const void *, const void *))(numeric ? numcmp
+                                                     : fold  ? foldcmp
+                                                             : _strcmp));
         writelines(lineptr, nlines, reverse);
         return 0;
     } else {
