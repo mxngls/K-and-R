@@ -1,0 +1,15 @@
+char **argv
+int (*daytab[13]
+int dirdcl(); /* direct declaration */
+int *daytab[13]
+void *comp()
+int dirdcl(
+
+void (*comp)()
+
+char (*(*x())[])()
+char (*(*x[3])())[5]
+
+void *comp*()
+
+void *comp()
