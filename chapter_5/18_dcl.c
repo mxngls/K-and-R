@@ -98,6 +98,12 @@ int gettoken(void) {
     }
 }
 
+void skip_line() {
+    while (tokentype != '\n' && tokentype != EOF) {
+        gettoken();
+    }
+}
+
 /* Exercise 5-18. Make dcl recover from input errors. */
 int main() {
     while (++line && (gettoken()) != EOF) { /* 1st token on line */
@@ -115,17 +121,14 @@ int main() {
         /* parse rest of line */
         if (!dcl()) {
             printf("%s: line %d column %d\n", errmsg, line, col);
-            errmsg[0] = '\0';
-            while (gettoken() != '\n')
-                ;
+            skip_line();
             continue;
         };
 
         if (tokentype != '\n') {
             printf("syntax error: line %d; column %d: %c\n", line, col,
                    tokentype);
-            while (gettoken() != '\n')
-                ;
+            skip_line();
             continue;
         }
 
