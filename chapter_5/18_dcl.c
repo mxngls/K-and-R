@@ -21,7 +21,6 @@ char datatype[MAXTOKEN]; /* data type = char, int, etc. */
 char out[1000];
 
 int line;
-int col;
 
 char errmsg[MAXLEN]; /* maximum length of messages describing errors */
 
@@ -68,28 +67,24 @@ int gettoken(void) {
     int c;
     char *p = token;
     while ((c = getch()) == ' ' || c == '\t')
-        col++;
+        ;
     if (c == '(') {
         if ((c = (char)getch()) == ')') {
-            col++;
             strcpy(token, "()");
             return tokentype = PARENS;
         } else {
-            col--;
             ungetch(c);
             return tokentype = '(';
         }
     } else if (c == '[') {
         for (*p++ = (char)c; (*p++ = (char)getch()) != ']';)
-            col++;
+            ;
         *p = '\0';
         return tokentype = BRACKETS;
     } else if (isalpha(c)) {
         for (*p++ = (char)c; isalnum(c = getch());) {
-            col++;
             *p++ = (char)c;
         }
-        col--;
         *p = '\0';
         ungetch(c);
         return tokentype = NAME;
@@ -107,16 +102,16 @@ void skip_line() {
 /* Exercise 5-18. Make dcl recover from input errors. */
 int main() {
     while (++line && (gettoken()) != EOF) { /* 1st token on line */
-        col = 0;
-
-        /* preserve empty lines */
-        if (tokentype == '\n') {
+        if (tokentype != '\n') {            /* is the datatype */
+            strcpy(datatype, token);        /* preserve empty lines */
+            out[0] = '\0';
+        } else {
             printf("\n");
             continue;
         }
 
-        strcpy(datatype, token); /* is the datatype */
-        out[0] = '\0';
+        /* reset column counter */
+        col = 0;
 
         /* parse rest of line */
         if (!dcl()) {
