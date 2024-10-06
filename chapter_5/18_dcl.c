@@ -29,7 +29,7 @@ int dcl(void) {
     int ns;
     for (ns = 0; gettoken() == '*';) /* count *'s */
         ns++;
-    if (!dirdcl())
+    if (dirdcl() == ERROR)
         return ERROR;
     while (ns-- > 0)
         strcat(out, " pointer to");
@@ -103,10 +103,10 @@ void skip_line() {
 int main() {
     while (++line && (gettoken()) != EOF) { /* 1st token on line */
         if (tokentype != '\n') {            /* is the datatype */
-            strcpy(datatype, token);        /* preserve empty lines */
+            strcpy(datatype, token);
             out[0] = '\0';
         } else {
-            printf("\n");
+            printf("\n"); /* preserve empty lines */
             continue;
         }
 
@@ -114,7 +114,7 @@ int main() {
         col = 0;
 
         /* parse rest of line */
-        if (!dcl()) {
+        if (dcl() == ERROR) {
             printf("%s: line %d column %d\n", errmsg, line, col);
             skip_line();
             continue;
