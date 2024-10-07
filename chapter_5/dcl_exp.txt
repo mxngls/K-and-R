@@ -1,7 +1,7 @@
 char **argv
 int (*daytab[13]
 
-int dirdcl(); /* direct declaration */
+int dirdcl()
 int *daytab[13]
 void *comp()
 int dirdcl(
@@ -11,4 +11,8 @@ char (*(*x())[])()
 char (*(*x[3])())[5]
 
 void *comp*()
-void *comp()
+void comp(char s1)
+
+extern const void comp ()
+const void comp ()
+static long int x

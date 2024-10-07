@@ -19,15 +19,11 @@ int tokentype;           /* type of last token */
 char token[MAXTOKEN];    /* last token string */
 char datatype[MAXTOKEN]; /* data type = char, int, etc. */
 char name[MAXTOKEN];     /* variable name */
+char store[MAXTOKEN];    /* storage class specifier */
 char out[1000];
 
 int line;
-int col;
-
-int store;
-int qual;
-int mod;
-int spec;
+extern int col;
 
 char errmsg[MAXLEN]; /* maximum length of messages describing errors */
 
@@ -89,45 +85,45 @@ int typespec() {
 }
 
 int parsedt() {
+
+    int qual = 0;
+    int mod = 0;
+    int spec = 0;
+
     do {
         if (typestore() == TRUE) {
-            printf("True!\n");
-            if (store) {
+            if (*store) {
                 strcpy(errmsg, "error: duplicate storage class specifier");
                 return ERROR;
-            } else {
-                store = TRUE;
-                strcat(datatype, token);
-                strcat(datatype, " ");
             }
+            strcpy(store, token);
+            strcat(store, " ");
+            continue;
         } else if (typequal() == TRUE) {
             if (qual) {
                 strcpy(errmsg, "error: duplicate type qualifier");
                 return ERROR;
-            } else {
-                qual = TRUE;
-                strcat(datatype, token);
-                strcat(datatype, " ");
             }
+            qual = TRUE;
         } else if (typemod() == TRUE) {
             if (mod) {
                 strcpy(errmsg, "error: duplicate type specifier");
                 return ERROR;
-            } else {
-                mod = TRUE;
-                strcat(datatype, token);
-                strcat(datatype, " ");
             }
+            mod = TRUE;
         } else if (typespec() == TRUE) {
             if (spec) {
                 strcpy(errmsg, "error: duplicate type specifier");
                 return ERROR;
-            } else {
-                spec = TRUE;
-                strcat(datatype, token);
-                strcat(datatype, " ");
+            } else if (mod && strcmp(token, "void") == 0) {
+                strcpy(errmsg,
+                       "error:  void cannot be used with type modifiers");
+                return ERROR;
             }
+            spec = TRUE;
         }
+        strcat(datatype, token);
+        strcat(datatype, " ");
     } while (!spec && (gettoken() == NAME));
 
     return 0;
@@ -212,20 +208,14 @@ int main() {
             continue;
         }
 
-        store = 0;
-        qual = 0;
-        mod = 0;
-        spec = 0;
+        store[0] = '\0';
+        datatype[0] = '\0';
+        out[0] = '\0';
 
-        /* parse data type */
-        parsedt();
-
-        /* reset column counter */
-        col = 0;
-
-        /* parse rest of line */
-        if (dcl() == ERROR) {
-            printf("%s: line %d column %d\n", errmsg, line, col);
+        /* parse the data type and proceed to the rest of the line */
+        if (parsedt() == ERROR || dcl() == ERROR) {
+            printf("%s: line %d column %lu\n", errmsg, line,
+                   col - strlen(token) + 1);
             skip2end();
             continue;
         };
@@ -237,7 +227,10 @@ int main() {
             continue;
         }
 
-        printf("%s: %s %s\n", name, out, datatype);
+        /* reset column counter */
+        col = 1;
+
+        printf("%s%s: %s %s\n", store, name, out, datatype);
     }
     return 0;
 }
