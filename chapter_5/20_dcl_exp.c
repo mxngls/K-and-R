@@ -19,8 +19,14 @@ int tokentype;           /* type of last token */
 char token[MAXTOKEN];    /* last token string */
 char datatype[MAXTOKEN]; /* data type = char, int, etc. */
 char name[MAXTOKEN];     /* variable name */
+char argname[MAXTOKEN];  /* argument name */
 char store[MAXTOKEN];    /* storage class specifier */
 char out[1000];
+
+const char *store_t[] = {"extern", "static", NULL};
+const char *spec_t[] = {"char", "double", "float", "int", "void", NULL};
+const char *mod_t[] = {"long", "short", "signed", "unsigned", NULL};
+const char *qual_t = "const";
 
 int line;
 extern int col;
@@ -44,10 +50,9 @@ int dcl(void) {
 
 /* storage class specifier */
 int typestore() {
-    const char *st[] = {"extern", "static", NULL};
     int i;
-    for (i = 0; st[i] != NULL; i++) {
-        if (strcmp(st[i], token) == 0)
+    for (i = 0; store_t[i] != NULL; i++) {
+        if (strcmp(store_t[i], token) == 0)
             return TRUE;
     }
     return FALSE;
@@ -55,8 +60,7 @@ int typestore() {
 
 /* type qualifier */
 int typequal() {
-    char *q = "const";
-    if (strcmp(q, token) == 0)
+    if (strcmp(qual_t, token) == 0)
         return TRUE;
     else
         return FALSE;
@@ -64,10 +68,9 @@ int typequal() {
 
 /* type modifier */
 int typemod() {
-    char *m[] = {"long", "short", "signed", "unsigned", NULL};
     int i;
-    for (i = 0; m[i] != NULL; i++) {
-        if (strcmp(m[i], token) == 0)
+    for (i = 0; mod_t[i] != NULL; i++) {
+        if (strcmp(mod_t[i], token) == 0)
             return TRUE;
     }
     return FALSE;
@@ -75,10 +78,9 @@ int typemod() {
 
 /* type specifier */
 int typespec() {
-    char *s[] = {"char", "double", "float", "int", "void", NULL};
     int i;
-    for (i = 0; s[i] != NULL; i++) {
-        if (strcmp(s[i], token) == 0)
+    for (i = 0; spec_t[i] != NULL; i++) {
+        if (strcmp(spec_t[i], token) == 0)
             return TRUE;
     }
     return FALSE;
@@ -86,9 +88,9 @@ int typespec() {
 
 int parsedt() {
 
-    int qual = 0;
-    int mod = 0;
-    int spec = 0;
+    int nqual = 0;
+    int nmod = 0;
+    int nspec = 0;
 
     do {
         if (typestore() == TRUE) {
@@ -100,31 +102,31 @@ int parsedt() {
             strcat(store, " ");
             continue;
         } else if (typequal() == TRUE) {
-            if (qual) {
+            if (nqual) {
                 strcpy(errmsg, "error: duplicate type qualifier");
                 return ERROR;
             }
-            qual = TRUE;
+            qual_t++;
         } else if (typemod() == TRUE) {
-            if (mod) {
+            if (nmod) {
                 strcpy(errmsg, "error: duplicate type specifier");
                 return ERROR;
             }
-            mod = TRUE;
+            nmod++;
         } else if (typespec() == TRUE) {
-            if (spec) {
+            if (nspec) {
                 strcpy(errmsg, "error: duplicate type specifier");
                 return ERROR;
-            } else if (mod && strcmp(token, "void") == 0) {
+            } else if (nmod && strcmp(token, "void") == 0) {
                 strcpy(errmsg,
                        "error:  void cannot be used with type modifiers");
                 return ERROR;
             }
-            spec = TRUE;
+            nspec++;
         }
         strcat(datatype, token);
         strcat(datatype, " ");
-    } while (!spec && (gettoken() == NAME));
+    } while (!nspec && (gettoken() == NAME));
 
     return 0;
 }
