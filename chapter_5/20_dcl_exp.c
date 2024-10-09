@@ -11,42 +11,29 @@ enum { NAME, PARENS, BRACKETS };
 enum { OK, ERROR };
 enum { FALSE, TRUE };
 
-int dcl(void);
-int dirdcl(void);
+int dcl(int);
+int dirdcl(int);
 int gettoken(void);
 
-int tokentype;           /* type of last token */
-char token[MAXTOKEN];    /* last token string */
-char datatype[MAXTOKEN]; /* data type = char, int, etc. */
-char name[MAXTOKEN];     /* variable name */
-char argname[MAXTOKEN];  /* argument name */
-char store[MAXTOKEN];    /* storage class specifier */
+int tokentype;              /* type of last token */
+char token[MAXTOKEN];       /* last token string */
+char datatype[MAXTOKEN];    /* data type = char, int, etc. */
+char name[MAXTOKEN];        /* variable name */
+char argdatatype[MAXTOKEN]; /* data type = char, int, etc. */
+char argname[MAXTOKEN];     /* argument name */
+char store[MAXTOKEN];       /* storage class specifier */
 char out[1000];
 
 const char *store_t[] = {"extern", "static", NULL};
 const char *spec_t[] = {"char", "double", "float", "int", "void", NULL};
-const char *mod_t[] = {"long", "short", "signed", "unsigned", NULL};
-const char *qual_t = "const";
+const char *mod_t[] = {"long", "short", NULL};
+const char *smod_t[] = {"signed", "unsigned", NULL};
+const char *qual_t[] = {"const", "volatile", NULL};
 
 int line;
 extern int col;
 
 char errmsg[MAXLEN]; /* maximum length of messages describing errors */
-
-/* dcl: parse a declarator */
-int dcl(void) {
-    int ns;
-    for (ns = 0; gettoken() == '*';) /* count *'s */
-        ns++;
-
-    if (dirdcl() == ERROR)
-        return ERROR;
-
-    while (ns-- > 0)
-        strcat(out, " pointer to");
-
-    return OK;
-}
 
 /* storage class specifier */
 int typestore() {
@@ -60,10 +47,12 @@ int typestore() {
 
 /* type qualifier */
 int typequal() {
-    if (strcmp(qual_t, token) == 0)
-        return TRUE;
-    else
-        return FALSE;
+    int i;
+    for (i = 0; qual_t[i] != NULL; i++) {
+        if (strcmp(qual_t[i], token) == 0)
+            return TRUE;
+    }
+    return FALSE;
 }
 
 /* type modifier */
@@ -71,7 +60,11 @@ int typemod() {
     int i;
     for (i = 0; mod_t[i] != NULL; i++) {
         if (strcmp(mod_t[i], token) == 0)
-            return TRUE;
+            return -1;
+    }
+    for (i = 0; smod_t[i] != NULL; i++) {
+        if (strcmp(smod_t[i], token) == 0)
+            return 1;
     }
     return FALSE;
 }
@@ -86,10 +79,11 @@ int typespec() {
     return FALSE;
 }
 
-int parsedt() {
+int parsedt(int args) {
 
     int nqual = 0;
     int nmod = 0;
+    int nsmod = 0;
     int nspec = 0;
 
     do {
@@ -106,13 +100,19 @@ int parsedt() {
                 strcpy(errmsg, "error: duplicate type qualifier");
                 return ERROR;
             }
-            qual_t++;
-        } else if (typemod() == TRUE) {
+            nqual++;
+        } else if (typemod() == 1) {
             if (nmod) {
                 strcpy(errmsg, "error: duplicate type specifier");
                 return ERROR;
             }
             nmod++;
+        } else if (typemod() == -1) {
+            if (nsmod) {
+                strcpy(errmsg, "error: duplicate type specifier");
+                return ERROR;
+            }
+            nsmod++;
         } else if (typespec() == TRUE) {
             if (nspec) {
                 strcpy(errmsg, "error: duplicate type specifier");
@@ -124,37 +124,91 @@ int parsedt() {
             }
             nspec++;
         }
-        strcat(datatype, token);
-        strcat(datatype, " ");
+        if (args == TRUE) {
+            argname[0] = '\0';
+            argdatatype[0] = '\0';
+            strcat(argdatatype, token);
+        } else {
+            strcat(datatype, token);
+            strcat(datatype, " ");
+        }
+
     } while (!nspec && (gettoken() == NAME));
 
     return 0;
 }
 
+/* dcl: parse a declarator */
+int dcl(int args) {
+    parsedt(args);
+
+    int ns;
+    for (ns = 0; gettoken() == '*';) /* count *'s */
+        ns++;
+
+    if (dirdcl(args) == ERROR)
+        return ERROR;
+
+    while (ns-- > 0)
+        strcat(out, " pointer to");
+
+    return OK;
+}
+
 /* dirdcl: parse a direct declarator */
-int dirdcl(void) {
-    int type;
-    if (tokentype == '(') { /* ( dcl ) */
-        dcl();
+int dirdcl(int args) {
+
+    int type = 0;
+
+
+    if (tokentype == '(') {
+        dcl(FALSE);
         if (tokentype != ')') {
             strcpy(errmsg, "error: missing )");
             return ERROR;
         }
     } else if (tokentype == NAME) {
-        strcpy(name, token);
+        if (args == TRUE) {
+            strcpy(argname, " ");
+            strcat(argname, token);
+
+            strcat(out, argname);
+            strcat(out, ": ");
+            strcat(out, argdatatype);
+
+            argname[0] = '\0';
+            argdatatype[0] = '\0';
+        } else {
+            strcpy(name, token);
+        }
     } else {
         strcpy(errmsg, "error: expected name or (dcl)");
         return ERROR;
     }
 
-    while ((type = gettoken()) == PARENS || type == BRACKETS)
+
+    while ((type = gettoken()) == PARENS || type == BRACKETS || type == '(' ||
+           type == ')' || type == ',') {
+
         if (type == PARENS) {
-            strcat(out, " function returning");
-        } else {
+            strcat(out, " function taking no arguments returning");
+        } else if (type == '(') {
+            strcat(out, " function accepting parameter");
+            dcl(TRUE);
+        } else if (type == ')') {
+            if (args)
+                strcat(out, " returning");
+            break;
+        } else if (type == BRACKETS) {
             strcat(out, " array");
             strcat(out, token);
             strcat(out, " of");
+        } else if (type == ',') {
+            strcat(out, " and parameter");
+            dcl(TRUE);
+            break;
         }
+    }
 
     return OK;
 }
@@ -215,7 +269,7 @@ int main() {
         out[0] = '\0';
 
         /* parse the data type and proceed to the rest of the line */
-        if (parsedt() == ERROR || dcl() == ERROR) {
+        if (dcl(FALSE) == ERROR) {
             printf("%s: line %d column %lu\n", errmsg, line,
                    col - strlen(token) + 1);
             skip2end();
