@@ -4,25 +4,20 @@
 
 #include "char.c"
 
-#define MAXTOKEN 100
-#define MAXLEN 100
+#define MAXTOKEN 1000
+#define MAXLEN 1000
 
 enum { NAME, PARENS, BRACKETS };
 enum { OK, ERROR };
 enum { FALSE, TRUE };
 
-int dcl(int);
-int dirdcl(int);
+int dcl(char *out, char *name);
+int dirdcl(char *out, char *name);
 int gettoken(void);
 
-int tokentype;              /* type of last token */
-char token[MAXTOKEN];       /* last token string */
-char datatype[MAXTOKEN];    /* data type = char, int, etc. */
-char name[MAXTOKEN];        /* variable name */
-char argdatatype[MAXTOKEN]; /* data type = char, int, etc. */
-char argname[MAXTOKEN];     /* argument name */
-char store[MAXTOKEN];       /* storage class specifier */
-char out[1000];
+int tokentype;        /* type of last token */
+char token[MAXTOKEN]; /* last token string */
+char store[MAXTOKEN]; /* storage class specifier */
 
 const char *store_t[] = {"extern", "static", NULL};
 const char *spec_t[] = {"char", "double", "float", "int", "void", NULL};
@@ -79,7 +74,7 @@ int typespec() {
     return FALSE;
 }
 
-int parsedt(int args) {
+int pdt(char *dt) {
 
     int nqual = 0;
     int nmod = 0;
@@ -124,91 +119,91 @@ int parsedt(int args) {
             }
             nspec++;
         }
-        if (args == TRUE) {
-            argname[0] = '\0';
-            argdatatype[0] = '\0';
-            strcat(argdatatype, token);
-        } else {
-            strcat(datatype, token);
-            strcat(datatype, " ");
-        }
+        strcat(dt, token);
 
     } while (!nspec && (gettoken() == NAME));
 
     return 0;
 }
 
-/* dcl: parse a declarator */
-int dcl(int args) {
-    parsedt(args);
-
-    int ns;
-    for (ns = 0; gettoken() == '*';) /* count *'s */
-        ns++;
-
-    if (dirdcl(args) == ERROR)
-        return ERROR;
-
-    while (ns-- > 0)
-        strcat(out, " pointer to");
-
-    return OK;
-}
-
 /* dirdcl: parse a direct declarator */
-int dirdcl(int args) {
+int dirdcl(char *out, char *name) {
 
     int type = 0;
 
-
     if (tokentype == '(') {
-        dcl(FALSE);
+        if (dcl(out, name) == ERROR)
+            return ERROR;
         if (tokentype != ')') {
             strcpy(errmsg, "error: missing )");
             return ERROR;
         }
+    } else if (tokentype == ')') {
+        gettoken();
     } else if (tokentype == NAME) {
-        if (args == TRUE) {
-            strcpy(argname, " ");
-            strcat(argname, token);
-
-            strcat(out, argname);
-            strcat(out, ": ");
-            strcat(out, argdatatype);
-
-            argname[0] = '\0';
-            argdatatype[0] = '\0';
-        } else {
-            strcpy(name, token);
-        }
+        strcat(name, token);
     } else {
         strcpy(errmsg, "error: expected name or (dcl)");
         return ERROR;
     }
 
-
-    while ((type = gettoken()) == PARENS || type == BRACKETS || type == '(' ||
-           type == ')' || type == ',') {
+    while ((type = gettoken()) == PARENS || type == BRACKETS || type == '(') {
 
         if (type == PARENS) {
             strcat(out, " function taking no arguments returning");
-        } else if (type == '(') {
+        } else if (type == '(' || type == ',') {
             strcat(out, " function accepting parameter");
-            dcl(TRUE);
-        } else if (type == ')') {
-            if (args)
-                strcat(out, " returning");
+
+            char argout[MAXLEN];
+            char argdt[MAXTOKEN];
+            char argname[MAXTOKEN];
+
+            argdt[0] = '\0';
+            argout[0] = '\0';
+            argname[0] = '\0';
+
+            /* advance another token to skip the opening parentheses */
+            gettoken();
+
+            if (pdt(argdt) == ERROR)
+                return ERROR;
+
+            if (dcl(argout, argname) == ERROR)
+                return ERROR;
+
+            strcat(out, " ");
+            strcat(out, argname);
+            strcat(out, ":");
+            strcat(out, argout);
+            strcat(out, " ");
+            strcat(out, argdt);
+            strcat(out, " returning");
+
+            /* advance another token to skip the closing parentheses */
+            if (tokentype == ')')
+                gettoken();
             break;
         } else if (type == BRACKETS) {
             strcat(out, " array");
             strcat(out, token);
             strcat(out, " of");
-        } else if (type == ',') {
-            strcat(out, " and parameter");
-            dcl(TRUE);
-            break;
         }
     }
+
+    return OK;
+}
+
+/* dcl: parse a declarator */
+int dcl(char *out, char *name) {
+    int ns;
+    for (ns = 0; gettoken() == '*';) /* count *'s */
+        ns++;
+
+    if (dirdcl(out, name) == ERROR)
+        return ERROR;
+
+    while (ns-- > 0)
+        strcat(out, " pointer to");
 
     return OK;
 }
@@ -245,7 +240,7 @@ int gettoken(void) {
     }
 }
 
-void skip2end() {
+void toend() {
     while (tokentype != '\n' && tokentype != EOF) {
         gettoken();
     }
@@ -263,30 +258,38 @@ int main() {
             printf("\n");
             continue;
         }
+        char out[1000];
+        char dt[MAXTOKEN];
+        char n[MAXTOKEN];
 
         store[0] = '\0';
-        datatype[0] = '\0';
+        dt[0] = '\0';
         out[0] = '\0';
+        n[0] = '\0';
 
-        /* parse the data type and proceed to the rest of the line */
-        if (dcl(FALSE) == ERROR) {
+        /* parse the data type */
+        if (pdt(dt) == ERROR)
+            return ERROR;
+
+        /* then proceed to the rest of the line */
+        if (dcl(out, n) == ERROR) {
             printf("%s: line %d column %lu\n", errmsg, line,
                    col - strlen(token) + 1);
-            skip2end();
+            toend();
             continue;
         };
 
         if (tokentype != '\n') {
             printf("syntax error: line %d; column %d: %c\n", line, col,
                    tokentype);
-            skip2end();
+            toend();
             continue;
         }
 
         /* reset column counter */
         col = 1;
 
-        printf("%s%s: %s %s\n", store, name, out, datatype);
+        printf("%s%s:%s %s\n", store, n, out, dt);
     }
     return 0;
 }
