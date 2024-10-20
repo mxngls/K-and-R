@@ -4,50 +4,50 @@
 #define MAX_LEN 4096
 
 int reverse(char s[]) {
-  int i, j, tmp;
-  char c;
+    int i, j, tmp;
+    char c;
 
-  i = j = 0; /* Get length of input string */
-  while ((c = s[i++]) != '\0')
-    j++;
+    i = j = 0; /* Get length of input string */
+    while ((c = s[i++]) != '\0')
+        j++;
 
-  i = 0;
-  j--;
-
-  while (i < j) {
-    tmp = s[i];
-    s[i] = s[j];
-    s[j] = tmp;
-
-    i++;
+    i = 0;
     j--;
-  }
 
-  return 0;
+    while (i < j) {
+        tmp = s[i];
+        s[i] = s[j];
+        s[j] = tmp;
+
+        i++;
+        j--;
+    }
+
+    return 0;
 }
 
 /* itoa:  convert n to characters in s */
 void itoa(int n, char s[]) {
-  int i, j, sign;
+    int i, j, sign;
 
-  if ((sign = n) < 0) /* record sign */
-    n = -n;           /* make n positive */
+    if ((sign = n) < 0) /* record sign */
+        n = -n;         /* make n positive */
 
-  i = 0;
+    i = 0;
 
-  do { /* generate digits in reverse order */
-    if ((j = (n % 10)) < 0)
-      j = -j; /* Set j to it's absolute value */
+    do { /* generate digits in reverse order */
+        if ((j = (n % 10)) < 0)
+            j = -j; /* Set j to it's absolute value */
 
-    s[i++] = j + '0'; /* get next digit */
-  } while (n /= 10);  /* delete it */
+        s[i++] = j + '0'; /* get next digit */
+    } while (n /= 10);    /* delete it */
 
-  if (sign < 0)
-    s[i++] = '-';
+    if (sign < 0)
+        s[i++] = '-';
 
-  s[i] = '\0';
+    s[i] = '\0';
 
-  reverse(s);
+    reverse(s);
 }
 
 /*
@@ -58,13 +58,13 @@ void itoa(int n, char s[]) {
  * which it runs.
  */
 int main() {
-  int i = INT_MIN;
-  char o[MAX_LEN];
+    int i = INT_MIN;
+    char o[MAX_LEN];
 
-  itoa(i, o);
-  printf("%d interpreted as a string evaluates to: %s\n", i, o);
+    itoa(i, o);
+    printf("%d interpreted as a string evaluates to: %s\n", i, o);
 
-  return 0;
+    return 0;
 }
 
 /*
