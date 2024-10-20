@@ -2,39 +2,38 @@
 #include <stdio.h>
 
 int _getline(char s[]) {
-  int i;
-  char c;
+    int i;
+    char c;
 
-  for (i = 0; i < MAX_INPUT; i++) {
+    for (i = 0; i < MAX_INPUT; i++) {
 
-    c = getchar();
+        c = getchar();
 
-    if (c == '\n') {
-      s[i] = c;
-      i++;
-      break;
-    } else if (c == EOF) {
-      return 0;
-    } else {
-      s[i] = c;
+        if (c == '\n') {
+            s[i] = c;
+            i++;
+            break;
+        } else if (c == EOF) {
+            return 0;
+        } else {
+            s[i] = c;
+        }
     }
-  }
 
-  s[i] = '\0';
+    s[i] = '\0';
 
-  return i;
+    return i;
 }
 
-/* Exercise 2-2.
- * Write a loop equivalent to the for loop above without using && or ||.
+/* 
+ * Exercise 2-2. Write a loop equivalent to the for loop above without
+ * using && or ||.
  */
-int main() {
-  int l;
-  char s[MAX_INPUT];
+int main() { int l; char s[MAX_INPUT];
 
-  while ((l = _getline(s)) > 0) {
-    printf("%s", s);
-  }
+    while ((l = _getline(s)) > 0) {
+        printf("%s", s);
+    }
 
-  return 0;
+    return 0;
 }

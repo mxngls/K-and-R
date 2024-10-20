@@ -5,30 +5,32 @@
  * "wrap around" to the other side. https://stackoverflow.com/a/3928821/13490131
  */
 unsigned int rightrot(unsigned int x, unsigned int n) {
-  unsigned int ls, rs, rot;
+    unsigned int ls, rs, rot;
 
-  /* needed so you don't right shift more than int width */
-  n %= 32;
+    /* needed so you don't right shift more than int width */
+    n %= 32;
 
-  /* right shifted */
-  rs = x >> n;
+    /* right shifted */
+    rs = x >> n;
 
-  /* left shifted */
-  ls = x << (32 - n);
+    /* left shifted */
+    ls = x << (32 - n);
 
-  /* rotated */
-  rot = ls | rs;
+    /* rotated */
+    rot = ls | rs;
 
-  return rot;
+    return rot;
 }
 
-/* Exercise 2-8. Write a function rightrot(x,n) that returns the value
- * of the integer x rotated to the right by n positions. */
+/*
+ * Exercise 2-8. Write a function rightrot(x,n) that returns the value
+ * of the integer x rotated to the right by n positions.
+ */
 int main() {
-  unsigned int x = 8; /* 0000 1000 -> 1000 [...] 0000 */
-  unsigned int n = 4;
+    unsigned int x = 8; /* 0000 1000 -> 1000 [...] 0000 */
+    unsigned int n = 4;
 
-  printf("%u\n", rightrot(x, n));
+    printf("%u\n", rightrot(x, n));
 
-  return 0;
+    return 0;
 }
