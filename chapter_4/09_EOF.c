@@ -16,11 +16,11 @@
  * Book" by Clovis L. Tondo, Scott E. Gimpel.
  *
  * See also page 43f. of K&R.
- * 
+ *
  */
 
 int buf[BUFSIZE]; /* buffer for ungetch */
-int bufp = 0;	  /* next free postion in buf */
+int bufp = 0;     /* next free postion in buf */
 
 int getch(void) /* get a posibly pushed back) character */
 {
@@ -40,8 +40,7 @@ void ungetch(int c) /* push character back on input */
  * correctly. Decide what their properties ought to be if an EOF is
  * pushed back, then implement your design.
  */
-int main(void)
-{
+int main(void) {
     int c;
 
     /* Prematurely send EOF. */

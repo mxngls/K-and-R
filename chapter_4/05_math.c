@@ -19,133 +19,133 @@ double pop(void);
 
 char s[MAXOP];
 
-/* 
- * Exercise 4-5. Add access to library functions like sin, exp, and pow. 
- * See <math.h> in Appendix B, Section 4. 
+/*
+ * Exercise 4-5. Add access to library functions like sin, exp, and pow.
+ * See <math.h> in Appendix B, Section 4.
  */
 int main() {
-  int type;
-  double op2;
+    int type;
+    double op2;
 
-  while ((type = getop(s)) != EOF) {
-    switch (type) {
-    case NUMBER:
-      push(atof(s));
-      break;
-    case ALPHA:
-      push(parse(s, pop()));
-      break;
-    case '+':
-      push(pop() + pop());
-      break;
-    case '*':
-      push(pop() * pop());
-      break;
-    case '-':
-      op2 = pop();
-      push(pop() - op2);
-      break;
-    case '/':
-      op2 = pop();
-      if (op2 != 0.0)
-        push(pop() / op2);
-      else
-        printf("error: zero divisor\n");
-      break;
-    case '%':
-      op2 = pop();
-      if (op2 != 0.0)
-        push(fmod(pop(), op2));
-      else
-        printf("error: zero modulo\n");
-      break;
-    case '\n':
-      printf("\t%.8g\n", pop());
-      break;
-    case 'p':
-      prints();
-      break;
-    case 'c':
-      clears();
-      break;
-    case 's':
-      swaps();
-      break;
-    case 'd':
-      dups();
-      break;
-    default:
-      printf("error: unknown command %s\n", s);
-      break;
+    while ((type = getop(s)) != EOF) {
+        switch (type) {
+        case NUMBER:
+            push(atof(s));
+            break;
+        case ALPHA:
+            push(parse(s, pop()));
+            break;
+        case '+':
+            push(pop() + pop());
+            break;
+        case '*':
+            push(pop() * pop());
+            break;
+        case '-':
+            op2 = pop();
+            push(pop() - op2);
+            break;
+        case '/':
+            op2 = pop();
+            if (op2 != 0.0)
+                push(pop() / op2);
+            else
+                printf("error: zero divisor\n");
+            break;
+        case '%':
+            op2 = pop();
+            if (op2 != 0.0)
+                push(fmod(pop(), op2));
+            else
+                printf("error: zero modulo\n");
+            break;
+        case '\n':
+            printf("\t%.8g\n", pop());
+            break;
+        case 'p':
+            prints();
+            break;
+        case 'c':
+            clears();
+            break;
+        case 's':
+            swaps();
+            break;
+        case 'd':
+            dups();
+            break;
+        default:
+            printf("error: unknown command %s\n", s);
+            break;
+        }
     }
-  }
-  return 0;
+    return 0;
 }
 
 double val[MAXVAL]; /* value stack */
 int sp = 0;         /* next free stack position */
 
 void prints(void) {
-  if (sp == 0)
-    printf("error: stack empty\n");
-  else if (sp > 1) {
-    printf("Current top of stack: %g %g\n", val[sp - 1], val[sp - 2]);
-  } else
-    printf("Only one element in stack: %g\n", val[sp - 1]);
+    if (sp == 0)
+        printf("error: stack empty\n");
+    else if (sp > 1) {
+        printf("Current top of stack: %g %g\n", val[sp - 1], val[sp - 2]);
+    } else
+        printf("Only one element in stack: %g\n", val[sp - 1]);
 }
 
 void clears(void) {
-  while (sp > 0)
-    sp--;
-  printf("cleared stack\n");
+    while (sp > 0)
+        sp--;
+    printf("cleared stack\n");
 }
 
 void swaps(void) {
-  int tmp;
-  if (sp > 1) {
-    tmp = val[sp - 1];
-    val[sp - 1] = val[sp - 2];
-    val[sp - 2] = tmp;
-  }
+    int tmp;
+    if (sp > 1) {
+        tmp = val[sp - 1];
+        val[sp - 1] = val[sp - 2];
+        val[sp - 2] = tmp;
+    }
 }
 
 void dups(void) {
-  if (sp > 1) {
-    push(val[sp - 2]);
-    push(val[sp - 2]);
-  } else
-    printf("error: stack empty\n");
+    if (sp > 1) {
+        push(val[sp - 2]);
+        push(val[sp - 2]);
+    } else
+        printf("error: stack empty\n");
 }
 
 double parse(char s[], double n) {
-  if (strncmp(s, "sin", 3) == 0) {
-    return sin(n);
-  } else if (strncmp(s, "cos", 3) == 0) {
-    return cos(n);
-  } else if (strncmp(s, "tan", 3) == 0) {
-    return tan(n);
-  } else {
-    printf("error: unrecognized operator\n");
-    return 0.0;
-  }
+    if (strncmp(s, "sin", 3) == 0) {
+        return sin(n);
+    } else if (strncmp(s, "cos", 3) == 0) {
+        return cos(n);
+    } else if (strncmp(s, "tan", 3) == 0) {
+        return tan(n);
+    } else {
+        printf("error: unrecognized operator\n");
+        return 0.0;
+    }
 }
 
 /* push:  push f onto value stack */
 void push(double f) {
-  if (sp < MAXVAL)
-    val[sp++] = f;
-  else
-    printf("error: stack full, can't push %g\n", f);
+    if (sp < MAXVAL)
+        val[sp++] = f;
+    else
+        printf("error: stack full, can't push %g\n", f);
 }
 
 /* pop:  pop and return top value from stack */
 double pop(void) {
-  if (sp > 0)
-    return val[--sp];
-  else {
-    printf("error: stack empty\n");
-    return 0.0;
-  }
+    if (sp > 0)
+        return val[--sp];
+    else {
+        printf("error: stack empty\n");
+        return 0.0;
+    }
 }
 
 #include <ctype.h>
@@ -155,75 +155,75 @@ void ungetch(int);
 
 /* getop:  get next character or numeric operand */
 int getop(char s[]) {
-  int i, c;
+    int i, c;
 
-  while ((s[0] = c = getch()) == ' ' || c == '\t')
-    ;
+    while ((s[0] = c = getch()) == ' ' || c == '\t')
+        ;
 
-  s[1] = '\0';
+    s[1] = '\0';
 
-  i = 0;
+    i = 0;
 
-  /*
-   * Keep parsing characters as long as there are some. Then return a
-   * value indicating that the main program now has to deal with a
-   * sequence of multiple characters. The way we structured our programm
-   * before forces us now to account for a couple of edge cases so that
-   * we don't skip one of the possible four instructions introduced in
-   * exercise 4-3. I saw other solutions that took a different approach
-   * and instead mapped the mathematical functions to other characters.
-   * I think both are decent approaches. I chose to deal with characters
-   * so that users may use the name of library functions as they are
-   * provided by math.h
-   */
+    /*
+     * Keep parsing characters as long as there are some. Then return a
+     * value indicating that the main program now has to deal with a
+     * sequence of multiple characters. The way we structured our programm
+     * before forces us now to account for a couple of edge cases so that
+     * we don't skip one of the possible four instructions introduced in
+     * exercise 4-3. I saw other solutions that took a different approach
+     * and instead mapped the mathematical functions to other characters.
+     * I think both are decent approaches. I chose to deal with characters
+     * so that users may use the name of library functions as they are
+     * provided by math.h
+     */
 
-  int f;
-  if (isalpha(c)) {
-    f = c;
-    if (!isalpha(c = getch())) {
-      return f;
-    } else {
-      s[i++] = f;
-      s[i++] = c;
+    int f;
+    if (isalpha(c)) {
+        f = c;
+        if (!isalpha(c = getch())) {
+            return f;
+        } else {
+            s[i++] = f;
+            s[i++] = c;
+        }
+
+        while (isalpha(c = getch())) {
+            s[i++] = c;
+        }
+
+        ungetch(c);
+
+        s[i] = '\0';
+
+        return ALPHA;
     }
 
-    while (isalpha(c = getch())) {
-      s[i++] = c;
+    if (!isdigit(c) && c != '.' && c != '-')
+        return c; /* not a number */
+
+    if (c == '-') {
+        if (isdigit(c = getch())) { /* the '-' is an algebraic sign */
+            s[++i] = c;
+        } else { /* the '-' is an operator */
+            ungetch(c);
+            return '-';
+        }
     }
 
-    ungetch(c);
+    if (isdigit(c))
+        while (isdigit(s[++i] = c = getch()))
+            ;
+
+    if (c == '.') /* collect fraction part */
+        while (isdigit(s[++i] = c = getch()))
+            ;
 
     s[i] = '\0';
 
-    return ALPHA;
-  }
+    if (c != EOF)
+        ungetch(c);
 
-  if (!isdigit(c) && c != '.' && c != '-')
-    return c; /* not a number */
-
-  if (c == '-') {
-    if (isdigit(c = getch())) { /* the '-' is an algebraic sign */
-      s[++i] = c;
-    } else { /* the '-' is an operator */
-      ungetch(c);
-      return '-';
-    }
-  }
-
-  if (isdigit(c))
-    while (isdigit(s[++i] = c = getch()))
-      ;
-
-  if (c == '.') /* collect fraction part */
-    while (isdigit(s[++i] = c = getch()))
-      ;
-
-  s[i] = '\0';
-
-  if (c != EOF)
-    ungetch(c);
-
-  return NUMBER;
+    return NUMBER;
 }
 
 #define BUFSIZE 100
@@ -233,13 +233,13 @@ int bufp = 0;      /* next free position in buf */
 
 int getch(void) /* get a (possibly pushed-back) character */
 {
-  return (bufp > 0) ? buf[--bufp] : getchar();
+    return (bufp > 0) ? buf[--bufp] : getchar();
 }
 
 void ungetch(int c) /* push character back on input */
 {
-  if (bufp >= BUFSIZE)
-    printf("ungetch: too many characters\n");
-  else
-    buf[bufp++] = c;
+    if (bufp >= BUFSIZE)
+        printf("ungetch: too many characters\n");
+    else
+        buf[bufp++] = c;
 }

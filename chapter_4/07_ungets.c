@@ -9,32 +9,32 @@ int bufp = 0;      /* next free position in buf */
 
 int getch(void) /* get a (possibly pushed-back) character */
 {
-  return (bufp > 0) ? buf[--bufp] : getchar();
+    return (bufp > 0) ? buf[--bufp] : getchar();
 }
 
 int ungetch(int c) /* push character back on input */
 {
-  if (bufp >= BUFSIZE) {
-    return EOF;
-  } else {
-    buf[bufp++] = c;
-    return c;
-  }
+    if (bufp >= BUFSIZE) {
+        return EOF;
+    } else {
+        buf[bufp++] = c;
+        return c;
+    }
 }
 
 /* ungets: push back s onto the input */
 int ungets(char s[]) {
-  int i, len;
+    int i, len;
 
-  len = strlen(s);
+    len = strlen(s);
 
-  for (i = len - 1; i >= 0; --i)
-    if (ungetch(s[i]) == EOF) {
-      printf("ungetch: too many characters (char: '%c')\n", s[len - i]);
-      return EOF;
-    }
+    for (i = len - 1; i >= 0; --i)
+        if (ungetch(s[i]) == EOF) {
+            printf("ungetch: too many characters (char: '%c')\n", s[len - i]);
+            return EOF;
+        }
 
-  return 0;
+    return 0;
 }
 
 /*
@@ -58,31 +58,31 @@ int ungets(char s[]) {
  *
  */
 int main() {
-  int c, i;
-  char s[MAXLEN];
+    int c, i;
+    char s[MAXLEN];
 
-  printf("Enter string to test ungets function:\n");
+    printf("Enter string to test ungets function:\n");
 
-  i = 0;
-  while ((c = getch()) != EOF && i < MAXLEN - 1) {
-    if (c == '\n') {
-      s[i] = '\0';
-      i = 0;
+    i = 0;
+    while ((c = getch()) != EOF && i < MAXLEN - 1) {
+        if (c == '\n') {
+            s[i] = '\0';
+            i = 0;
 
-      printf("Pushing back: %s\n", s);
+            printf("Pushing back: %s\n", s);
 
-      /* push back entire string s */
-      if (ungets(s) == EOF)
-        return 1;
+            /* push back entire string s */
+            if (ungets(s) == EOF)
+                return 1;
 
-      /* print the whole input string again */
-      for (c = 0; s[c] != '\0'; c++)
-        putchar(s[c]);
+            /* print the whole input string again */
+            for (c = 0; s[c] != '\0'; c++)
+                putchar(s[c]);
 
-    } else {
-      s[i++] = c;
+        } else {
+            s[i++] = c;
+        }
     }
-  }
 
-  return 0;
+    return 0;
 }

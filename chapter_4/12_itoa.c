@@ -5,21 +5,21 @@
 
 /* itoa:  convert n to characters in s */
 void itoa(int n, char s[]) {
-  static int i;
+    static int i;
 
-  if (n / 10) {
-    itoa(n / 10, s);
-  } else {
-    i = 0;
+    if (n / 10) {
+        itoa(n / 10, s);
+    } else {
+        i = 0;
 
-    if (n < 0) { /* record sign */
-      s[i++] = '-';
-      n = -n;
+        if (n < 0) { /* record sign */
+            s[i++] = '-';
+            n = -n;
+        }
     }
-  }
 
-  s[i++] = abs(n) % 10 + '0';
-  s[i] = '\0';
+    s[i++] = abs(n) % 10 + '0';
+    s[i] = '\0';
 }
 
 /*
@@ -28,18 +28,18 @@ void itoa(int n, char s[]) {
  * recursive routine.
  */
 int main() {
-  int i;
-  char s[MAXLEN];
+    int i;
+    char s[MAXLEN];
 
-  i = -123;
+    i = -123;
 
-  itoa(i, s);
-  printf("%s\n", s);
+    itoa(i, s);
+    printf("%s\n", s);
 
-  i = 123;
+    i = 123;
 
-  itoa(i, s);
-  printf("%s\n", s);
+    itoa(i, s);
+    printf("%s\n", s);
 
-  return 0;
+    return 0;
 }
