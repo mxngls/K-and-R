@@ -16,17 +16,17 @@
  * Pad with '\0's if ct has fewer than n characters.
  */
 char *_strncpy(char *s, const char *ct, size_t n) {
-  int i;
+    int i;
 
-  i = 0;
-  while (i++ < n) {
-    if (*ct)
-      *s++ = *ct++;
-    else
-      *s++ = '\0';
-  }
+    i = 0;
+    while (i++ < n) {
+        if (*ct)
+            *s++ = *ct++;
+        else
+            *s++ = '\0';
+    }
 
-  return s;
+    return s;
 }
 
 /*
@@ -34,18 +34,18 @@ char *_strncpy(char *s, const char *ct, size_t n) {
  * s with '\0'; return s.
  */
 char *_strncat(char *s, const char *ct, size_t n) {
-  int i;
+    int i;
 
-  while (*s)
-    s++;
+    while (*s)
+        s++;
 
-  i = 0;
-  while (++i < n && (*s++ = *ct++))
-    ;
+    i = 0;
+    while (++i < n && (*s++ = *ct++))
+        ;
 
-  *s = '\0';
+    *s = '\0';
 
-  return s;
+    return s;
 }
 
 /*
@@ -53,48 +53,48 @@ char *_strncat(char *s, const char *ct, size_t n) {
  * return <0 if cs<ct, 0 if cs==ct, or >0 if cs>ct.
  */
 int _strncmp(const char *cs, const char *ct, size_t n) {
-  int i;
+    int i;
 
-  i = 0;
-  while (i++ < n && (*cs++ == *ct++)) {
-    if (!*cs)
-      return 0;
-  }
-  
-  return *cs - *ct;
+    i = 0;
+    while (i++ < n && (*cs++ == *ct++)) {
+        if (!*cs)
+            return 0;
+    }
+
+    return *cs - *ct;
 }
 
 int main() {
-  char source[SIZE] = "Hello, World!";
-  char target_1[SIZE];
-  char target_2[SIZE];
+    char source[SIZE] = "Hello, World!";
+    char target_1[SIZE];
+    char target_2[SIZE];
 
-  _strncpy(target_1, source, 6);
+    _strncpy(target_1, source, 6);
 
-  /* prints "Hello," */
-  printf("%s\n", target_1);
+    /* prints "Hello," */
+    printf("%s\n", target_1);
 
-  _strncpy(target_2, source, 20);
+    _strncpy(target_2, source, 20);
 
-  /* visualize null bytes used as padding */
-  int i = -1;
-  while (source[++i])
-    printf("%c\n", target_1[i]);
+    /* visualize null bytes used as padding */
+    int i = -1;
+    while (source[++i])
+        printf("%c\n", target_1[i]);
 
-  char head[SIZE] = "Hello, ";
-  char tail[SIZE] = "World!";
+    char head[SIZE] = "Hello, ";
+    char tail[SIZE] = "World!";
 
-  _strncat(head, tail, 6);
+    _strncat(head, tail, 6);
 
-  /* prints "Hello, World" (missing '!') */
-  printf("%s\n", head);
+    /* prints "Hello, World" (missing '!') */
+    printf("%s\n", head);
 
-  char part[SIZE] = "Hello,";
-  int r;
-  r = _strncmp(source, part, 10);
+    char part[SIZE] = "Hello,";
+    int r;
+    r = _strncmp(source, part, 10);
 
-  /* prints "87" */
-  printf("%d\n", r);
+    /* prints "87" */
+    printf("%d\n", r);
 
-  return 0;
+    return 0;
 }

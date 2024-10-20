@@ -13,44 +13,44 @@ int bufp = 0;
 int getch(void) { return (bufp > 0) ? buf[--bufp] : getchar(); }
 
 void ungetch(int c) {
-  if (bufp >= BUFSIZE)
-    printf("ungetch: too many characters\n");
-  else
-    buf[bufp++] = c;
+    if (bufp >= BUFSIZE)
+        printf("ungetch: too many characters\n");
+    else
+        buf[bufp++] = c;
 }
 
 /* getint:  get next integer from input into *pn */
 int getint(int *pn) {
-  int c, sign;
+    int c, sign;
 
-  while (isspace(c = getch()))
-    ; /* skip whit space */
+    while (isspace(c = getch()))
+        ; /* skip whit space */
 
-  if (!isdigit(c) && c != EOF && c != '+' && c != '-') {
-    ungetch(c); /* it's not a number */
-    return 0;
-  }
-
-  sign = (c == '-') ? -1 : 1;
-
-  if (c == '+' || c == '-') {
-    if (!isdigit(c = getch())) {
-      if (c != EOF)
-        ungetch(c);
-      ungetch(sign == 1 ? '+' : '-');
-      return 0;
+    if (!isdigit(c) && c != EOF && c != '+' && c != '-') {
+        ungetch(c); /* it's not a number */
+        return 0;
     }
-  }
 
-  for (*pn = 0; isdigit(c); c = getch())
-    *pn = 10 * *pn + (c - '0');
+    sign = (c == '-') ? -1 : 1;
 
-  *pn *= sign;
+    if (c == '+' || c == '-') {
+        if (!isdigit(c = getch())) {
+            if (c != EOF)
+                ungetch(c);
+            ungetch(sign == 1 ? '+' : '-');
+            return 0;
+        }
+    }
 
-  if (c != EOF)
-    ungetch(c);
+    for (*pn = 0; isdigit(c); c = getch())
+        *pn = 10 * *pn + (c - '0');
 
-  return c;
+    *pn *= sign;
+
+    if (c != EOF)
+        ungetch(c);
+
+    return c;
 }
 
 /*
@@ -66,16 +66,16 @@ int getint(int *pn) {
  * getint might expect.
  */
 int main() {
-  int n, s, getinssdt(int *);
+    int n, s, getinssdt(int *);
 
-  int array[LEN] = {0};
+    int array[LEN] = {0};
 
-  for (n = 0; n < LEN && getint(&array[n]) != EOF; n++) {
-    printf("inserting %d (pos %d)\n", array[n], n);
-  }
+    for (n = 0; n < LEN && getint(&array[n]) != EOF; n++) {
+        printf("inserting %d (pos %d)\n", array[n], n);
+    }
 
-  for (s = 0; s < n; s++)
-    printf("%d, ", array[s]);
+    for (s = 0; s < n; s++)
+        printf("%d, ", array[s]);
 
-  return 0;
+    return 0;
 }

@@ -4,11 +4,11 @@
 
 /* strcat: concatentate t to end of s; s must be big nough */
 void _strcat(char *s, char *t) {
-  while (*s) /* find end of s */
-    s++;
+    while (*s) /* find end of s */
+        s++;
 
-  while ((*s++ = *t++)) /* copy t */
-    ;
+    while ((*s++ = *t++)) /* copy t */
+        ;
 }
 
 /*
@@ -16,12 +16,12 @@ void _strcat(char *s, char *t) {
  * showed in Chapter 2: strcat(s,t) copies the string t to the end of s.
  */
 int main() {
-  char source[SIZE] = "Hello, ";
-  char target[SIZE] = "World!";
+    char source[SIZE] = "Hello, ";
+    char target[SIZE] = "World!";
 
-  _strcat(source, target);
+    _strcat(source, target);
 
-  printf("concatentated string: %s\n", source);
+    printf("concatentated string: %s\n", source);
 
-  return 0;
+    return 0;
 }
