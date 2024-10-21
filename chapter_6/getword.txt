@@ -1,0 +1,42 @@
+    /* void */
+    /* unsigned */
+    /* while */
+    /* break */
+    /* break */
+
+    /*
+        while
+        char
+        const
+        while
+        for
+        auto
+    */
+
+
+/* 
+should equal to:
+    2 char
+    3 if
+    2 int
+    1 return
+    1 while
+*/
+
+char ignore[] = " while, for, and if all need to be ignored! "
+
+int main() {
+    int n;
+    char word[MAXWORD];
+    while (getword(word, MAXWORD) != EOF) {
+        /* unsigned */
+        /* while */
+        if (isalpha(word[0]))
+            if ((n = binsearch(word, key_tab, NKEYS)) >= 0)
+                key_tab[n].count++;
+    }
+    for (n = 0; n < NKEYS; n++)
+        if (key_tab[n].count > 0)
+            printf("%4d %s\n", key_tab[n].count, key_tab[n].word);
+    return 0;
+}
