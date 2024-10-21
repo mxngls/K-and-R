@@ -24,8 +24,8 @@ int main() {
 
     char line[MAXLINE];
 
-    while (inspect_line(line) != -1) {
-    }
+    while (inspect_line(line) != -1)
+        ;
 
     return 0;
 }

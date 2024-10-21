@@ -1,7 +1,8 @@
-#include "char.c"
 #include <ctype.h>
 #include <stdio.h>
 #include <string.h>
+
+#include "char.c"
 
 #define MAXWORD 10000
 #define NKEYS (int)(sizeof keytab / sizeof(struct key))
