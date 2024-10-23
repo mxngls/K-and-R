@@ -83,7 +83,7 @@ void skipc() {
             return;
 }
 
-/* getword:  get next word or character from input */
+/* getword: get next word or character from input */
 int getword(char *word, int lim) {
     int c, getch(void);
     void ungetch(int);
