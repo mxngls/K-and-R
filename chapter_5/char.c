@@ -4,12 +4,22 @@
 
 char buf[BUFSIZE]; /* buffer for ungetch */
 int bufp = 0;      /* next free position in buf */
-int col = 0;       /* current column position */
+int col = 1;       /* current column position */
+int line = 1;      /* current line */
 
 /* get a (possibly pushed-back) character */
 int getch(void) {
-    col++;
-    return (bufp > 0) ? buf[--bufp] : getchar();
+    int c;
+    if (bufp > 0)
+        return buf[--bufp];
+    else {
+        col++;
+        if ((c = getchar()) == '\n') {
+            col = 0;
+            line++;
+        }
+        return c;
+    }
 }
 
 /* push character back on input */
