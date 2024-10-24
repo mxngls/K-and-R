@@ -41,7 +41,8 @@ int num;
  * are a bit lazy and do not restrict our matching to any particular
  * definition of a word that is more restrective than the initial
  * implementation of `getword` suggests. For a more in-depth discussion
- * see "https://stackoverflow.com/questions/52991889/what-is-the-definition-of-variable".
+ * see
+ * "https://stackoverflow.com/questions/52991889/what-is-the-definition-of-variable".
  */
 int main(int argc, char **argv) {
 
@@ -91,6 +92,7 @@ struct tnode *addtree(struct tnode *p, char *w) {
         p->right = addtree(p->right, w);
     return p;
 }
+
 /* treeprint: in-order print of tree p */
 void treeprint(struct tnode *p) {
     if (p != NULL) {
