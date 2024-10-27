@@ -55,7 +55,7 @@ int binsearch(char *, struct key *, int);
  *
  * Some restrictions applied:
  *
- * - We make our lifes easier as we only proclaim to give correct numbers
+ * - We make our life easier as we only proclaim to give correct numbers
  *   for C source files that compile succesfully.
  *
  * - We skip all preprocessor control lines and comments
