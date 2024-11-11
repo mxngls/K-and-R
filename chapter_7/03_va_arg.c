@@ -24,6 +24,15 @@ void minprintf(char *fmt, ...) {
             ival = va_arg(ap, int);
             printf("%d", ival);
             break;
+        case 'o':
+            ival = va_arg(ap, int);
+            printf("%o", ival);
+            break;
+        case 'x':
+        case 'X':
+            ival = va_arg(ap, int);
+            printf("%x", ival);
+            break;
         case 'u':
             ival = va_arg(ap, unsigned int);
             printf("%u", ival);
@@ -65,10 +74,13 @@ int main() {
 
             minprintf("Input: %d\n", atoi(inp));
             minprintf("Input: %i\n", atoi(inp));
+            minprintf("Input: %o\n", (unsigned)atoi(inp));
+            minprintf("Input: 0x%x\n", (unsigned)atoi(inp));
             minprintf("Input: %u\n", (unsigned)atoi(inp));
             minprintf("Input: %c\n", inp[0]);
             minprintf("Input: %s\n", inp);
             minprintf("Input: %f\n", atof(inp));
+            printf("\n");
 
             inp[0] = '\0';
             i = 0;
