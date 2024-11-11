@@ -12,9 +12,7 @@ void minprintf(char *fmt, ...) {
     double dval;
     va_start(ap, fmt); /* make ap point to 1st unnamed arg */
     for (p = fmt; *p; p++) {
-        if (*p == '\0') {
-            break;
-        } else if (*p != '%') {
+        if (*p != '%') {
             putchar(*p);
             continue;
         }
@@ -67,9 +65,13 @@ int main() {
 
     int i;
 
+    printf("Expecting Input:\n");
+    printf(">>> ");
+
     i = 0;
     while ((c = (char)getchar()) != EOF) {
         if (c == '\n') {
+
             inp[i] = '\0';
 
             minprintf("Input: %d\n", atoi(inp));
@@ -84,6 +86,9 @@ int main() {
 
             inp[0] = '\0';
             i = 0;
+
+            printf("Expecting Input:\n");
+            printf(">>> ");
         } else if (i < MAXLINE - 1) {
             inp[i++] = c;
         }
