@@ -12,9 +12,7 @@ void minprintf(char *fmt, ...) {
     double dval;
     va_start(ap, fmt); /* make ap point to 1st unnamed arg */
     for (p = fmt; *p; p++) {
-        if (*p == '\0') {
-            break;
-        } else if (*p != '%') {
+        if (*p != '%') {
             putchar(*p);
             continue;
         }
