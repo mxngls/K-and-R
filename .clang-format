@@ -4,3 +4,7 @@ ColumnLimit: 80
 ReflowComments:  true
 PenaltyBreakComment: 0
 PenaltyBreakOpenParenthesis: 1
+AllowShortBlocksOnASingleLine: true
+AllowShortIfStatementsOnASingleLine: true
+AllowShortLoopsOnASingleLine: true
+BreakBeforeBraces: Attach
