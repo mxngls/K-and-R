@@ -1,0 +1,10 @@
+CompileFlags:
+  Add: [
+    -std=c90, 
+    -fsanitize=undefined, 
+    -Wall, 
+    -Wextra, 
+    -Wconversion, 
+    -Wno-sign-conversion, 
+    -Wdouble-promotion
+  ]
