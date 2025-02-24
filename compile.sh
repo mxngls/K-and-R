@@ -6,8 +6,11 @@ gcc \
     -Wall \
     -Wextra \
     -Wconversion \
-    -Wno-sign-conversion \
+    -Wsign-conversion \
     -Wdouble-promotion \
+    -Werror \
+    -Wpedantic \
+    -Wpointer-arith \
+    -D_FORTIFY_SOURCE=2 \
     "$1" \
-    -o "./out/${1%.c}".out &&
-    ./out/"${1%.c}".out "${@:2}"
+    -o "./out/${1%.c}".out
