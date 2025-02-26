@@ -1,9 +1,7 @@
-/* standard library */
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
 
-/* system calls */
 #include <fcntl.h>
 #include <unistd.h>
 
