@@ -6,30 +6,27 @@
 #define BUFSIZ   1024
 #define OPEN_MAX 20 /* max #files open at once */
 
-typedef struct {
-    unsigned int read;  /* file open for reading */
-    unsigned int write; /* file open for writing */
-    unsigned int unbuf; /* file is unbuffered */
-    unsigned int eof;   /* EOF has occurred on this file */
-    unsigned int err;   /* error occurred on this file */
-} flags;
-
 typedef struct _iobuf {
-    int   cnt;   /* characters left */
-    char *ptr;   /* next character position */
-    char *base;  /* location of buffer */
-    flags flags; /* mode of file access */
-    int   fd;    /* file descriptor */
+    int   cnt;  /* characters left */
+    char *ptr;  /* next character position */
+    char *base; /* location of buffer */
+    int   flag; /* mode of file access */
+    int   fd;   /* file descriptor */
 } _FILE;
+
+enum _flags {
+    _READ  = 01,  /* file open for reading */
+    _WRITE = 02,  /* file open for writing */
+    _UNBUF = 04,  /* file is unbuffered */
+    _EOF   = 010, /* EOF has occurred on this file */
+    _ERR   = 020  /* error occurred on this file */
+};
 
 _FILE _iob[OPEN_MAX] = {
     /* stdin, stdout, stderr */
-    {
-     0, NULL,
-     NULL, {1, 0, 0, 0, 0},
-     0, },
-    {0, NULL, NULL, {0, 1, 0, 0, 0}, 1},
-    {0, NULL, NULL, {0, 1, 1, 1, 0}, 2}
+    {0, (char *)0, (char *)0, _READ,           0},
+    {0, (char *)0, (char *)0, _WRITE,          1},
+    {0, (char *)0, (char *)0, _WRITE | _UNBUF, 2}
 };
 
 #define _stdin  (&_iob[0])
@@ -52,81 +49,59 @@ int _flushbuf(int, _FILE *);
 
 #define PERMS 0666 /* RW for owner, group, others */
 
-_FILE *_fopen(const char *name, const char *mode) {
-    int    fd = 0;
-    _FILE *fp = NULL;
-
+_FILE *_fopen(char *name, char *mode) {
+    int    fd;
+    _FILE *fp;
     if (*mode != 'r' && *mode != 'w' && *mode != 'a')
         return NULL;
-
-    /* obtain open slot */
     for (fp = _iob; fp < _iob + OPEN_MAX; fp++)
-        if (!(fp)->flags.read && !(fp)->flags.unbuf)
-            break;
-
-    /* no open slots left */
-    if (fp >= _iob + OPEN_MAX)
+        if ((fp->flag & (_READ | _WRITE)) == 0)
+            break;             /* found free slot */
+    if (fp >= _iob + OPEN_MAX) /* no free slots */
         return NULL;
-
-    /* open or create file */
     if (*mode == 'w')
         fd = creat(name, PERMS);
     else if (*mode == 'a') {
         if ((fd = open(name, O_WRONLY, 0)) == -1)
             fd = creat(name, PERMS);
-        lseek(fd, 0L, SEEK_END);
+        lseek(fd, 0L, 2);
     } else
         fd = open(name, O_RDONLY, 0);
-
-    if (fd == -1)
+    if (fd == -1) /* couldn't access name */
         return NULL;
-
     fp->fd   = fd;
     fp->cnt  = 0;
     fp->base = NULL;
-
-    if (*mode == 'r')
-        fp->flags.read = 1;
-    else
-        fp->flags.write = 1;
-
+    fp->flag = (*mode == 'r') ? _READ : _WRITE;
     return fp;
 }
 
+/* _fillbuf: allocate and fill input buffer */
 int _fillbuf(_FILE *fp) {
-    unsigned int bufsize = 0;
-
-    /* check if we're allowed to access the input file */
-    if (!fp->flags.read || fp->flags.eof || fp->flags.err)
+    unsigned int bufsize;
+    if ((fp->flag & (_READ | _EOF | _ERR)) != _READ)
         return EOF;
-
-    /* get buffer size */
-    bufsize = (fp->flags.unbuf) ? 1 : BUFSIZ;
-
-    /* obtain buffer */
-    if (fp->base == NULL)
+    bufsize = (fp->flag & _UNBUF) ? 1 : BUFSIZ;
+    if (fp->base == NULL) /* no buffer yet */
         if ((fp->base = (char *)malloc(bufsize)) == NULL)
-            return EOF;
-
-    /* read contents into buffer */
+            return EOF; /* can't get buffer */
     fp->ptr = fp->base;
-    fp->cnt = (int)read(fp->fd, fp->base, bufsize);
-
-    /* set possible EOF flag */
+    fp->cnt = (int)read(fp->fd, fp->ptr, bufsize);
     if (--fp->cnt < 0) {
         if (fp->cnt == -1)
-            fp->flags.eof = 1;
-        else
-            fp->flags.err = 1;
-        fp->cnt = 0;
-    }
+            fp->flag |= _EOF;
 
+        else
+            fp->flag |= _ERR;
+        fp->cnt = 0;
+        return EOF;
+    }
     return (unsigned char)*fp->ptr++;
 }
 
 int main(int argc, char **argv) {
     _FILE *fp;
-    char   c;
+    int    c;
 
     if (argc == 1) {
         fprintf(stderr, "Usage: %s [file ...]\n", argv[0]);
@@ -134,10 +109,10 @@ int main(int argc, char **argv) {
     }
 
     while (--argc) {
-        if ((fp = _fopen(*++argv, "r")) == NULL) {
+        if ((fp = _fopen(*++argv, "r")) == NULL)
             return 1;
-        } else
-            while ((c = (char)getc(fp)) != EOF)
+        else
+            while ((c = getc(fp)))
                 putchar(c);
     }
 
