@@ -7,19 +7,19 @@
 #define OPEN_MAX 20 /* max #files open at once */
 
 typedef struct {
-    unsigned int read;  /* file open for reading */
-    unsigned int write; /* file open for writing */
-    unsigned int unbuf; /* file is unbuffered */
-    unsigned int eof;   /* EOF has occurred on this file */
-    unsigned int err;   /* error occurred on this file */
+        unsigned int read;  /* file open for reading */
+        unsigned int write; /* file open for writing */
+        unsigned int unbuf; /* file is unbuffered */
+        unsigned int eof;   /* EOF has occurred on this file */
+        unsigned int err;   /* error occurred on this file */
 } flags;
 
 typedef struct _iobuf {
-    int   cnt;   /* characters left */
-    char *ptr;   /* next character position */
-    char *base;  /* location of buffer */
-    flags flags; /* mode of file access */
-    int   fd;    /* file descriptor */
+        int   cnt;   /* characters left */
+        char *ptr;   /* next character position */
+        char *base;  /* location of buffer */
+        flags flags; /* mode of file access */
+        int   fd;    /* file descriptor */
 } _FILE;
 
 _FILE _iob[OPEN_MAX] = {
@@ -53,93 +53,97 @@ int _flushbuf(int, _FILE *);
 #define PERMS 0666 /* RW for owner, group, others */
 
 _FILE *_fopen(const char *name, const char *mode) {
-    int    fd = 0;
-    _FILE *fp = NULL;
+        int    fd = 0;
+        _FILE *fp = NULL;
 
-    if (*mode != 'r' && *mode != 'w' && *mode != 'a')
-        return NULL;
+        if (*mode != 'r' && *mode != 'w' && *mode != 'a')
+                return NULL;
 
-    /* obtain open slot */
-    for (fp = _iob; fp < _iob + OPEN_MAX; fp++)
-        if (!(fp)->flags.read && !(fp)->flags.unbuf)
-            break;
+        /* obtain open slot */
+        for (fp = _iob; fp < _iob + OPEN_MAX; fp++)
+                if (!(fp)->flags.read && !(fp)->flags.unbuf)
+                        break;
 
-    /* no open slots left */
-    if (fp >= _iob + OPEN_MAX)
-        return NULL;
+        /* no open slots left */
+        if (fp >= _iob + OPEN_MAX)
+                return NULL;
 
-    /* open or create file */
-    if (*mode == 'w')
-        fd = creat(name, PERMS);
-    else if (*mode == 'a') {
-        if ((fd = open(name, O_WRONLY, 0)) == -1)
-            fd = creat(name, PERMS);
-        lseek(fd, 0L, SEEK_END);
-    } else
-        fd = open(name, O_RDONLY, 0);
+        /* open or create file */
+        if (*mode == 'w')
+                fd = creat(name, PERMS);
+        else if (*mode == 'a') {
+                if ((fd = open(name, O_WRONLY, 0)) == -1)
+                        fd = creat(name, PERMS);
+                lseek(fd, 0L, SEEK_END);
+        } else
+                fd = open(name, O_RDONLY, 0);
 
-    if (fd == -1)
-        return NULL;
+        if (fd == -1)
+                return NULL;
 
-    fp->fd   = fd;
-    fp->cnt  = 0;
-    fp->base = NULL;
+        fp->fd   = fd;
+        fp->cnt  = 0;
+        fp->base = NULL;
 
-    if (*mode == 'r')
-        fp->flags.read = 1;
-    else
-        fp->flags.write = 1;
+        if (*mode == 'r')
+                fp->flags.read = 1;
+        else
+                fp->flags.write = 1;
 
-    return fp;
+        return fp;
 }
 
 int _fillbuf(_FILE *fp) {
-    unsigned int bufsize = 0;
+        unsigned int bufsize = 0;
 
-    /* check if we're allowed to access the input file */
-    if (!fp->flags.read || fp->flags.eof || fp->flags.err)
-        return EOF;
+        /* check if we're allowed to access the input file */
+        if (!fp->flags.read || fp->flags.eof || fp->flags.err)
+                return EOF;
 
-    /* get buffer size */
-    bufsize = (fp->flags.unbuf) ? 1 : BUFSIZ;
+        /* get buffer size */
+        bufsize = (fp->flags.unbuf) ? 1 : BUFSIZ;
 
-    /* obtain buffer */
-    if (fp->base == NULL)
-        if ((fp->base = (char *)malloc(bufsize)) == NULL)
-            return EOF;
+        /* obtain buffer */
+        if (fp->base == NULL)
+                if ((fp->base = (char *)malloc(bufsize)) == NULL)
+                        return EOF;
 
-    /* read contents into buffer */
-    fp->ptr = fp->base;
-    fp->cnt = (int)read(fp->fd, fp->base, bufsize);
+        /* read contents into buffer */
+        fp->ptr = fp->base;
+        fp->cnt = (int)read(fp->fd, fp->base, bufsize);
 
-    /* set possible EOF flag */
-    if (--fp->cnt < 0) {
-        if (fp->cnt == -1)
-            fp->flags.eof = 1;
-        else
-            fp->flags.err = 1;
-        fp->cnt = 0;
-    }
+        /* set possible EOF flag */
+        if (--fp->cnt < 0) {
+                if (fp->cnt == -1)
+                        fp->flags.eof = 1;
+                else
+                        fp->flags.err = 1;
+                fp->cnt = 0;
+        }
 
-    return (unsigned char)*fp->ptr++;
+        return (unsigned char)*fp->ptr++;
 }
 
+/*
+ * Exercise 8-2. Rewrite fopen and _fillbuf with fields instead of explicit bit operations.
+ * Compare code size and execution speed.
+ */
 int main(int argc, char **argv) {
-    _FILE *fp;
-    char   c;
+        _FILE *fp;
+        char   c;
 
-    if (argc == 1) {
-        fprintf(stderr, "Usage: %s [file ...]\n", argv[0]);
-        return 1;
-    }
+        if (argc == 1) {
+                fprintf(stderr, "Usage: %s [file ...]\n", argv[0]);
+                return 1;
+        }
 
-    while (--argc) {
-        if ((fp = _fopen(*++argv, "r")) == NULL) {
-            return 1;
-        } else
-            while ((c = (char)getc(fp)) != EOF)
-                putchar(c);
-    }
+        while (--argc) {
+                if ((fp = _fopen(*++argv, "r")) == NULL) {
+                        return 1;
+                } else
+                        while ((c = (char)getc(fp)) != EOF)
+                                putchar(c);
+        }
 
-    return 0;
+        return 0;
 }

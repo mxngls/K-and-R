@@ -8,36 +8,36 @@
  * speeds of the two versions.
  */
 int main(int argc, char **argv) {
-    int   fn = 1;
-    FILE *fp = NULL;
+        int   fn = 1;
+        FILE *fp = NULL;
 
-    if (argc < 2) {
-        fprintf(stderr, "Usage %s file1 [file2 ...]\n", argv[0]);
-        return 1;
-    }
-
-    while (--argc) {
-
-        char   buf[BUFSIZ] = {0};
-        size_t nb;
-
-        if ((fp = fopen(argv[fn], "r")) == NULL) {
-            fprintf(stderr, "Error opening \"%s\": %s\n", argv[fn], strerror(errno));
-            return 1;
-        }
-        while ((nb = fread(buf, sizeof buf[0], BUFSIZ, fp))) {
-            if ((nb != fwrite(buf, sizeof buf[0], nb, stdout))) {
-                fprintf(stderr, "Error writing to stdout: %s\n", strerror(errno));
-            }
+        if (argc < 2) {
+                fprintf(stderr, "Usage %s file1 [file2 ...]\n", argv[0]);
+                return 1;
         }
 
-        if (ferror(fp)) {
-            fprintf(stderr, "Error reading from %s: %s\n", argv[fn], strerror(errno));
+        while (--argc) {
+
+                char   buf[BUFSIZ] = {0};
+                size_t nb;
+
+                if ((fp = fopen(argv[fn], "r")) == NULL) {
+                        fprintf(stderr, "Error opening \"%s\": %s\n", argv[fn], strerror(errno));
+                        return 1;
+                }
+                while ((nb = fread(buf, sizeof buf[0], BUFSIZ, fp))) {
+                        if ((nb != fwrite(buf, sizeof buf[0], nb, stdout))) {
+                                fprintf(stderr, "Error writing to stdout: %s\n", strerror(errno));
+                        }
+                }
+
+                if (ferror(fp)) {
+                        fprintf(stderr, "Error reading from %s: %s\n", argv[fn], strerror(errno));
+                }
+
+                fclose(fp);
+                fn++;
         }
 
-        fclose(fp);
-        fn++;
-    }
-
-    return 0;
+        return 0;
 }
