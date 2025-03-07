@@ -1,3 +1,4 @@
+#include <errno.h>
 #include <stdlib.h>
 
 #undef NULL
@@ -134,14 +135,121 @@ int _flushbuf(int c, _FILE *fp) {
 }
 
 /*
+ * From the appendix:
+ * On an output stream, fflush causes any buffered but unwritten data to be written; on
+ * an input stream, the effect is undefined. It returns EOF for a write error, and zero
+ * otherwise. fflush(NULL) flushes all output streams.
+ */
+int fflush(_FILE *stream) {
+        ssize_t bufsize;
+        ssize_t nb;
+
+        if (stream == NULL) {
+                /*
+                 * NOTE: Would practically iterate over all open files and flush their respecitve
+                 * buffers one by one
+                 */
+                return 0;
+        }
+
+        bufsize = (stream->ptr - stream->base) + stream->cnt;
+        nb      = stream->ptr - stream->base;
+
+        if ((stream->flag & _WRITE) != _WRITE) {
+                /*
+                 * No write access, so we treat the stream as an input stream and simply do nothing
+                 */
+                return 0;
+        }
+
+        if (nb > 0 && (write(stream->fd, stream->base, (size_t)nb)) != nb) {
+                stream->flag |= _ERR;
+                return EOF;
+        }
+
+        stream->ptr = stream->base;
+        stream->cnt = stream->base == NULL ? 0 : (int)bufsize;
+
+        return 0;
+}
+
+/*
+ * From the appendix:
+ * fclose flushes any unwritten data for stream, discards any unread buffered input,
+ * frees any automatically allocated buffer, then closes the stream. It returns EOF if any
+ * errors occurred, and zero otherwise.
+ */
+int fclose(_FILE *stream) {
+        if (stream == NULL) {
+                return EOF;
+        }
+
+        /* flush the stream's buffer if it is an output buffer */
+        if ((stream->flag & _WRITE) == _WRITE) {
+                if (fflush(stream) == EOF) {
+                        return EOF;
+                }
+        }
+
+        /* free previously allocated buffer */
+        if (stream->base != NULL) {
+                free(stream->base);
+                stream->base = NULL;
+        }
+
+        /* close file descriptor */
+        if (close(stream->fd) == -1) {
+                errno = -1;
+                return EOF;
+        }
+
+        return 0;
+}
+
+/*
  * Exercise 8-3. Design and write _flushbuf, fflush, and fclose.
  */
 int main(void) {
-        int  i;
-        char c = (char)getc(_stdin);
-        putc(c, _stdout);
-        for (i = 0; i < BUFSIZ + 10; i++)
-                putc('\n', _stdout);
+        int    i;
+        _FILE *tmpf;
+
+        /* test _fluhbuf */
+        for (i = 0; i < BUFSIZ; i++) {
+                /* cycle through alphabet */
+                putc('a' + (i % 26), _stdout);
+
+                /* add newline for readability */
+                if ((i + 1) % 26 == 0) {
+                        putc('\n', _stdout);
+                }
+        }
+
         putc('\n', _stdout);
+        putc('\n', _stdout);
+
+        /* test fflush */
+        for (i = 0; i < 10; i++) {
+                putc('X', _stdout);
+        }
+        if (fflush(_stdout) == EOF) {
+                return 1;
+        }
+
+        putc('\n', _stdout);
+        putc('\n', _stdout);
+
+        /* test fclose */
+        tmpf = _fopen("tmpf.txt", "w"); /* create temporary file and write to it */
+        if (tmpf == NULL)
+                return 1;
+        for (i = 0; i < 26; i++) {
+                putc('a' + (i % 26), tmpf);
+        }
+        if (fclose(tmpf) == -1)
+                return 1;
+        for (i = 0; i < 10; i++) { /* expect a consecutive write attempt to fail */
+                putc('0' + (i % 10), tmpf);
+        }
+
         return 0;
 }
