@@ -42,7 +42,7 @@ int _flushbuf(int, _FILE *);
 #define fileno(p)  ((p)->fd)
 #define getc(p)    (--(p)->cnt >= 0 ? (unsigned char)*(p)->ptr++ : _fillbuf(p))
 #define putc(x, p) (--(p)->cnt >= 0 ? *(p)->ptr++ = x : _flushbuf(x, p))
-#define getchar()  getc(stdin)
+#define getchar()  getc(_stdin)
 #define putchar(x) putc((x), stdout)
 
 #include <fcntl.h>
@@ -211,6 +211,7 @@ int fclose(_FILE *stream) {
  */
 int main(void) {
         int    i;
+        char  *tmp;
         _FILE *tmpf;
 
         /* test _fluhbuf */
@@ -239,7 +240,8 @@ int main(void) {
         putc('\n', _stdout);
 
         /* test fclose */
-        tmpf = _fopen("tmpf.txt", "w"); /* create temporary file and write to it */
+        tmp  = "tmp_03_fclose.txt";
+        tmpf = _fopen(tmp, "w"); /* create temporary file and write to it */
         if (tmpf == NULL)
                 return 1;
         for (i = 0; i < 26; i++) {
@@ -250,6 +252,9 @@ int main(void) {
         for (i = 0; i < 10; i++) { /* expect a consecutive write attempt to fail */
                 putc('0' + (i % 10), tmpf);
         }
+
+        /* cleanup */
+        unlink(tmp);
 
         return 0;
 }
