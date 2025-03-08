@@ -37,8 +37,8 @@ _FILE _iob[OPEN_MAX] = {
 int _fillbuf(_FILE *);
 int _flushbuf(int, _FILE *);
 
-#define feof(p) ((p)->flag & _EOF) != 0)
-#define ferror(p) ((p)->flag & _ERR) != 0)
+#define feof(p) (((p)->flag & _EOF) != 0))
+#define ferror(p) (((p)->flag & _ERR) != 0))
 #define fileno(p)  ((p)->fd)
 #define getc(p)    (--(p)->cnt >= 0 ? (unsigned char)*(p)->ptr++ : _fillbuf(p))
 #define putc(x, p) (--(p)->cnt >= 0 ? *(p)->ptr++ = x : _flushbuf(x, p))
