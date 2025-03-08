@@ -140,7 +140,7 @@ int _flushbuf(int c, _FILE *fp) {
  * an input stream, the effect is undefined. It returns EOF for a write error, and zero
  * otherwise. fflush(NULL) flushes all output streams.
  */
-int fflush(_FILE *stream) {
+int _fflush(_FILE *stream) {
         ssize_t bufsize;
         ssize_t nb;
 
@@ -179,14 +179,14 @@ int fflush(_FILE *stream) {
  * frees any automatically allocated buffer, then closes the stream. It returns EOF if any
  * errors occurred, and zero otherwise.
  */
-int fclose(_FILE *stream) {
+int _fclose(_FILE *stream) {
         if (stream == NULL) {
                 return EOF;
         }
 
         /* flush the stream's buffer if it is an output buffer */
         if ((stream->flag & _WRITE) == _WRITE) {
-                if (fflush(stream) == EOF) {
+                if (_fflush(stream) == EOF) {
                         return EOF;
                 }
         }
@@ -232,7 +232,7 @@ int main(void) {
         for (i = 0; i < 10; i++) {
                 putc('X', _stdout);
         }
-        if (fflush(_stdout) == EOF) {
+        if (_fflush(_stdout) == EOF) {
                 return 1;
         }
 
@@ -247,7 +247,7 @@ int main(void) {
         for (i = 0; i < 26; i++) {
                 putc('a' + (i % 26), tmpf);
         }
-        if (fclose(tmpf) == -1)
+        if (_fclose(tmpf) == -1)
                 return 1;
         for (i = 0; i < 10; i++) { /* expect a consecutive write attempt to fail */
                 putc('0' + (i % 10), tmpf);
