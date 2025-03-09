@@ -1,6 +1,7 @@
 #!/bin/bash
 
 gcc \
+    -xc \
     -std=c90 \
     -fsanitize=undefined \
     -Wall \

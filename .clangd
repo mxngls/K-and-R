@@ -1,10 +1,15 @@
 CompileFlags:
   Add: [
+    -xc,
     -std=c90, 
     -fsanitize=undefined, 
     -Wall, 
     -Wextra, 
     -Wconversion, 
-    -Wno-sign-conversion, 
+    -W-sign-conversion, 
     -Wdouble-promotion
+    -Werror,
+    -Wpedantic,
+    -Wpointer-arith,
+    -D_FORTIFY_SOURCE=2
   ]
