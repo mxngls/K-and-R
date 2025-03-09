@@ -9,7 +9,13 @@ static Header *freep = NULL; /* empty list to get started */
 /* free: put block ap in free list */
 void _free(void *ap) {
         Header *bp, *p;
-        bp = (Header *)ap - 1; /* point to block header */
+
+        if (ap == NULL)
+                return;
+
+        bp = (Header *)ap - 1; /* point to block header and */
+        if (bp->s.size <= 1)   /* verify we deal with a minimum amount of valid units */
+                return;
 
         for (p = freep; !(bp > p && bp < p->s.ptr); p = p->s.ptr)
                 if (p >= p->s.ptr && (bp > p || bp < p->s.ptr))
