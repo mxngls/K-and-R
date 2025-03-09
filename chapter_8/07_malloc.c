@@ -34,7 +34,8 @@ void _free(void *ap) {
         freep = p;
 }
 
-#define NALLOC 1024 /* minimum #units to request */
+#define NALLOC    1024 /* minimum #units to request */
+#define MAXNALLOC 4096 /* maximum #units to request */
 
 /* morecore: ask system for more memory */
 static Header *morecore(unsigned nu) {
@@ -43,6 +44,8 @@ static Header *morecore(unsigned nu) {
 
         if (nu < NALLOC)
                 nu = NALLOC;
+        if (nu > MAXNALLOC)
+                return NULL;
 
         cp = sbrk((int)(nu * sizeof(Header)));
 
@@ -70,7 +73,8 @@ void *_malloc(unsigned nbytes) {
                 base.s.size                = 0;
         }
 
-        for (p = prevp->s.ptr;; prevp = p, p = p->s.ptr) {
+        p = prevp->s.ptr;
+        for (;;) {
                 if (p->s.size >= nunits) {
                         if (p->s.size == nunits) {
                                 prevp->s.ptr = p->s.ptr;
@@ -88,6 +92,9 @@ void *_malloc(unsigned nbytes) {
                 if (p == freep)
                         if ((p = morecore(nunits)) == NULL)
                                 return NULL;
+
+                prevp = p;
+                p     = p->s.ptr;
         }
 }
 
